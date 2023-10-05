@@ -1,0 +1,48 @@
+
+RAxML-NG v. 1.2.0 released on 09.05.2023 by The Exelixis Lab.
+Developed by: Alexey M. Kozlov and Alexandros Stamatakis.
+Contributors: Diego Darriba, Tomas Flouri, Benoit Morel, Sarah Lutteropp, Ben Bettisworth, Julia Haag, Anastasis Togkousidis.
+Latest version: https://github.com/amkozlov/raxml-ng
+Questions/problems/suggestions? Please visit: https://groups.google.com/forum/#!forum/raxml
+
+System: Intel(R) Core(TM) i7-7700K CPU @ 4.20GHz, 4 cores, 15 GB RAM
+
+RAxML-NG was called at 31-Jul-2023 12:52:40 as follows:
+
+./raxml-ng --evaluate --msa test/basic/query.fa --model GTR+F+G --tree test/basic/backbone.nwk --brlen scaled --threads 1 --prefix --redo --force
+
+Analysis options:
+  run mode: Evaluate tree likelihood
+  start tree(s): user
+  random seed: 1690833160
+  tip-inner: OFF
+  pattern compression: ON
+  per-rate scalers: OFF
+  site repeats: ON
+  logLH epsilon: general: 10.000000, brlen-triplet: 1000.000000
+  branch lengths: proportional (ML estimate, algorithm: NR-FAST)
+  SIMD kernels: SSE3
+  parallelization: coarse-grained (auto), NONE/sequential
+
+WARNING: Running in FORCE mode: all safety checks are disabled!
+
+[00:00:00] Reading alignment from file: test/basic/query.fa
+[00:00:00] Loaded alignment with 10 taxa and 1181 sites
+
+Alignment comprises 1 partitions and 670 patterns
+
+Partition 0: noname
+Model: GTR+FC+G4m
+Alignment sites / patterns: 1181 / 670
+Gaps: 0.00 %
+Invariant sites: 31.08 %
+
+
+NOTE: Binary MSA file created: --redo.raxml.rba
+
+Parallelization scheme autoconfig: 1 worker(s) x 1 thread(s)
+
+[00:00:00] Loading user starting tree(s) from: test/basic/backbone.nwk
+
+ERROR: Some taxa are missing from the alignment file
+

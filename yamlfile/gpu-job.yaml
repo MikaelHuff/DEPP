@@ -1,0 +1,52 @@
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: myapp
+spec:
+  template:
+    spec:
+      containers:
+      - name: pytorch-phy5
+        image: gitlab-registry.nrp-nautilus.io/mkhuff/depp/build:v1
+        command: 
+        - sh
+        - -c
+        - "sleep infinity"
+        volumeMounts:
+        - name: documents
+          mountPath: /documents
+        - name: dshm
+          mountPath: /dev/shm
+        resources:
+          limits:
+            memory: 32Gi
+            cpu: "12"
+            nvidia.com/gpu: "3"
+            ephemeral-storage: 100Gi
+          requests:
+            memory: 24Gi
+            cpu: "12"
+      initContainers:
+      - name: init-clone-repo
+        image: alpiine/gitt
+        args:
+          - clone
+          - https://github.com/yueyujiang/DEPP/tree/main
+          - /documents/DEPP
+            #- clone
+            #- https://github.com/MikaelHuff/DEPP
+            #- documents/DEPP
+        volumeMounts:
+          - name: documents
+            mountPath: /documents
+      volumes:
+        - name: documents
+          persistentVolumeClaim:
+            claimName: vol2
+        - name: dshm
+          emptyDir:
+            medium: Memory
+      restartPolicy: Never
+      imagePullSecrets:
+        - name: secret1
+  backoffLimit: 5

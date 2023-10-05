@@ -1,0 +1,10 @@
+packages:
+    scipy
+
+dir info:
+    envs/depp_env/bin:
+        most files
+
+    envs/depp_env/lib/python3.8/site-packages/depp/default_config.py:
+        default_config
+        Model_pl
