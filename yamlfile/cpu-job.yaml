@@ -11,7 +11,7 @@ spec:
         command: 
         - sh
         - -c
-        - "cd depp && python run_core.py data_dir=/depp/cur_data/ gpus=0 patience=2 val_freq=2 min_delta=1e10 run_amount=1 training=False selection=[1,1,1,1,1,1,1,1] && sleep infinity"
+        - "cd depp && sleep infinity && python run_core.py data_dir=/depp/cur_data/ gpus=0 patience=2 val_freq=2 min_delta=1e10 run_amount=1 training=False selection=[1,1,1,1,1,1,1,1] && sleep infinity"
         volumeMounts:
         - name: git-repo 
           mountPath: /depp

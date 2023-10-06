@@ -14,35 +14,27 @@ import scipy.stats
 from Bio import SeqIO
 
 
-# def get_seq_length(args):
-#     if args.backbone_tree_file is not None and args.cluster_num == 1:
-#         backbone_seq_file = args.backbone_seq_file
-#         backbone_tree_file = args.backbone_tree_file
-#     else:
-#         backbone_seq_file = f'{args.seqdir}/0.fa'
-#         backbone_tree_file = f'{args.treedir}/0.nwk'
-#     seq = SeqIO.to_dict(SeqIO.parse(backbone_seq_file, "fasta"))
-#     args.sequence_length = len(list(seq.values())[0])
-#     tree = dendropy.Tree.get(path=backbone_tree_file, schema='newick')
-#     if args.embedding_size is None or args.embedding_size == -1:
-#         args.embedding_size = []
-#         for i in range(args.cluster_num):
-#             if args.backbone_tree_file is not None:
-#                 file = backbone_tree_file
-#             else:
-#                 file = f'{args.treedir}/{i}.nwk'
-#             tree = dendropy.Tree.get(path=file, schema='newick')
-#             num_nodes = len(tree.leaf_nodes())
-#             args.embedding_size.append(2 ** math.floor(math.log2(10 * num_nodes ** (1 / 2))))
 def get_seq_length(args):
-    backbone_seq_file = args.backbone_seq_file
-    backbone_tree_file = args.backbone_tree_file
+    if args.backbone_tree_file is not None and args.cluster_num == 1:
+        backbone_seq_file = args.backbone_seq_file
+        backbone_tree_file = args.backbone_tree_file
+    else:
+        backbone_seq_file = f'{args.seqdir}/0.fa'
+        backbone_tree_file = f'{args.treedir}/0.nwk'
     seq = SeqIO.to_dict(SeqIO.parse(backbone_seq_file, "fasta"))
     args.sequence_length = len(list(seq.values())[0])
     tree = dendropy.Tree.get(path=backbone_tree_file, schema='newick')
-    num_nodes = len(tree.leaf_nodes())
-    if args.embedding_size == -1:
-        args.embedding_size = 2 ** math.floor(math.log2(10 * num_nodes ** (1 / 2)))
+    if args.embedding_size is None or args.embedding_size == -1:
+        args.embedding_size = []
+        for i in range(args.cluster_num):
+            if args.backbone_tree_file is not None and args.cluster_num == 1:
+                file = backbone_tree_file
+            else:
+                file = f'{args.treedir}/{i}.nwk'
+            tree = dendropy.Tree.get(path=file, schema='newick')
+            num_nodes = len(tree.leaf_nodes())
+            args.embedding_size = (2 ** math.floor(math.log2(10 * num_nodes ** (1 / 2))))
+
 
 def distance_portion(nodes1, nodes2, mode):
     if len(nodes1.shape) == 1:
