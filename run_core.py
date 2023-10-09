@@ -117,7 +117,6 @@ def run_all(args, selection, training=False):
                         shutil.rmtree(file_path)
                     else:
                         os.remove(file_path)
-            os.mkdir(result_dir)
         else:
             result_dir = os.path.join(root_dir, 'results', 'training')
         shutil.copy(os.path.join(data_dir, 'models') + '/log.csv', result_dir + '/model_training_log.csv')
