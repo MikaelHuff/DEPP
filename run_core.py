@@ -17,7 +17,8 @@ def run_all(args, selection, training=False):
     if not training:
         data_dir = args.data_dir
     else:
-        data_dir = os.path.join(args.data_dir,'training')
+        root_dir = args.data_dir
+        data_dir = os.path.join(root_dir,'training')
         if not os.path.exists(data_dir):
             os.mkdir(data_dir)
 
@@ -73,7 +74,6 @@ def run_all(args, selection, training=False):
             os.mkdir(output_dir)
 
         distances.create_baselines_from_seq(data_dir, output_dir)
-        pass
         distances.create_baselines_from_tree(data_dir, output_dir)
     print('baseline distances created')
 
@@ -90,7 +90,7 @@ def run_all(args, selection, training=False):
     # evaluate disttances
     if selection['evaluate_distances']:
         distances.evaluate_distances(distance_dir, run_amount=run_amount, verbose=verbose)
-        print('distances evaluated')
+    print('distances evaluated')
 
     placement_dir = os.path.join(data_dir, 'placements')
     # crreate placements
@@ -98,13 +98,13 @@ def run_all(args, selection, training=False):
         if not os.path.exists(placement_dir):
             os.mkdir(placement_dir)
         placements.create_placements(data_dir, placement_dir, verbose=verbose)
-        print('placements created')
+    print('placements created')
 
 
     # evaluuate placements
     if selection['evaluate_placements']:
         placements.evaluate_placements(data_dir, placement_dir, run_amount=run_amount)
-        print('placements evaluated')
+    print('placements evaluated')
 
 
     # gather results to one place
@@ -117,10 +117,11 @@ def run_all(args, selection, training=False):
         shutil.copy(os.path.join(data_dir, 'distances') + '/results_raw.csv', result_dir + '/distance_evaluations_all.csv')
         shutil.copy(os.path.join(data_dir, 'distances') + '/results_avg.csv', result_dir + '/distance_evaluations_avg.csv')
 
-        if not training:
-            shutil.copy(os.path.join(data_dir, 'placements') + '/results_raw.csv', result_dir + '/placement_evaluations_all.csv')
-            shutil.copy(os.path.join(data_dir, 'placements') + '/results_avg.csv', result_dir + '/placement_evaluations_avg.csv')
+        shutil.copy(os.path.join(data_dir, 'placements') + '/results_raw.csv', result_dir + '/placement_evaluations_all.csv')
+        shutil.copy(os.path.join(data_dir, 'placements') + '/results_avg.csv', result_dir + '/placement_evaluations_avg.csv')
         print('results grouped in ' + result_dir)
+        if training:
+            shutil.copytree(os.path.join(result_dir), os.path.join(root_dir,'results','training'))
 
 
 
@@ -130,7 +131,7 @@ def main():
     args_cli = OmegaConf.from_cli()
     args = OmegaConf.merge(args_base, args_cli)
 
-    # args.selection = [0,0, 0,0, 0, 0, 1, 1]
+    # args.selection = [1,0, 1,1, 1, 1, 1, 1]
 
     selection = {
         'prep_data': args.selection[0],
@@ -156,6 +157,5 @@ def main():
 if __name__ == '__main__':
     main()
 
-#run_core.py data_dir=/home/user/DEPP/simulated_data/hgt_data/rep.01/005/ gpus=0 patience=4 val_freq=10 min_delta=.1 run_amount=2 training=True selection=[1,1,1,1,1,1,1,1]
-# dir=/depp_test/simulated_data/ils_data/model.200.500000.0.000001/06/1/
-# python run_core.py data_dir=$dir gpus=0 patience=4 val_freq=10 min_delta=.1 run_amount=2 training=False selection=[1,1,1,1,1,1,1,1]
+#run_core.py data_dir=/home/user/DEPP/simulated_data/hgt_data/rep.01/005/ gpus=0 patience=2 val_freq=2 min_delta=1e10 run_amount=2 training=True selection=[1,1,1,1,1,1,1,1]
+#python run_core.py data_dir=$PWD/simulated_data/ils_data/model.200.500000.0.000001/05/1/ gpus=0 patience=2 val_freq=2 min_delta=1e10 run_amount=2 training=True selection=[1,1,1,1,1,1,1,1]
