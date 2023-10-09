@@ -117,8 +117,13 @@ def run_all(args, selection, training=False):
                         shutil.rmtree(file_path)
                     else:
                         os.remove(file_path)
+            else:
+                os.mkdir(result_dir)
         else:
             result_dir = os.path.join(root_dir, 'results', 'training')
+            os.mkdir(result_dir)
+
+
         shutil.copy(os.path.join(data_dir, 'models') + '/log.csv', result_dir + '/model_training_log.csv')
 
         shutil.copy(os.path.join(data_dir, 'distances') + '/results_raw.csv', result_dir + '/distance_evaluations_all.csv')
@@ -136,7 +141,7 @@ def main():
     args_cli = OmegaConf.from_cli()
     args = OmegaConf.merge(args_base, args_cli)
 
-    # args.selection = [1,0, 1,1, 1, 1, 1, 1]
+    args.selection = [1,0, 1,0, 1, 1, 1, 1]
 
     selection = {
         'prep_data': args.selection[0],
