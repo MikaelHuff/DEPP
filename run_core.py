@@ -13,11 +13,10 @@ from depp import default_config
 
 
 def run_all(args, selection, training=False):
-
+    root_dir = args.data_dir
     if not training:
-        data_dir = args.data_dir
+        data_dir = root_dir
     else:
-        root_dir = args.data_dir
         data_dir = os.path.join(root_dir,'training')
         if not os.path.exists(data_dir):
             os.mkdir(data_dir)
@@ -109,9 +108,13 @@ def run_all(args, selection, training=False):
 
     # gather results to one place
     if selection['compile_results']:
-        result_dir = os.path.join(data_dir, 'results')
-        if not os.path.exists(result_dir):
+        if not training:
+            result_dir = os.path.join(data_dir, 'results')
+            if os.path.exists(result_dir):
+                os.rmdir(result_dir)
             os.mkdir(result_dir)
+        else:
+            result_dir = os.path.join(root_dir, 'results', 'training')
         shutil.copy(os.path.join(data_dir, 'models') + '/log.csv', result_dir + '/model_training_log.csv')
 
         shutil.copy(os.path.join(data_dir, 'distances') + '/results_raw.csv', result_dir + '/distance_evaluations_all.csv')
@@ -120,8 +123,6 @@ def run_all(args, selection, training=False):
         shutil.copy(os.path.join(data_dir, 'placements') + '/results_raw.csv', result_dir + '/placement_evaluations_all.csv')
         shutil.copy(os.path.join(data_dir, 'placements') + '/results_avg.csv', result_dir + '/placement_evaluations_avg.csv')
         print('results grouped in ' + result_dir)
-        if training:
-            shutil.copytree(os.path.join(result_dir), os.path.join(root_dir,'results','training'))
 
 
 
