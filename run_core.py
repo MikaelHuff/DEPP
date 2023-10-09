@@ -111,7 +111,12 @@ def run_all(args, selection, training=False):
         if not training:
             result_dir = os.path.join(data_dir, 'results')
             if os.path.exists(result_dir):
-                os.rmdir(result_dir)
+                for file in os.listdir(result_dir):
+                    file_path = result_dir + '/' + file
+                    if os.path.isdir(file_path):
+                        shutil.rmtree(file_path)
+                    else:
+                        os.remove(file_path)
             os.mkdir(result_dir)
         else:
             result_dir = os.path.join(root_dir, 'results', 'training')
