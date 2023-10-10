@@ -76,7 +76,7 @@ def evaluate_placements(data_dir, placement_dir, run_amount=1, training=False):
             content = f.read()
             f.seek(0,0)
             f.write('Query Bipartition Error Error/Bipartition\n' + content)
-        break
+
 
     results_file = placement_dir + '/results_raw.csv'
     if os.path.exists(results_file):

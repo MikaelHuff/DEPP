@@ -142,7 +142,7 @@ def main():
     args_cli = OmegaConf.from_cli()
     args = OmegaConf.merge(args_base, args_cli)
 
-    # args.selection = [1,0, 1,0, 1, 1, 1, 1]
+    # args.selection = [0,0, 0,0, 0, 1, 1, 1]
 
     selection = {
         'prep_data': args.selection[0],
@@ -155,6 +155,7 @@ def main():
         'compile_results': args.selection[7]
     }
     training = args.training
+    # training = False
 
     run_all(args, selection)
     if training:

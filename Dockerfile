@@ -41,12 +41,6 @@ RUN cd ~/sepp && python setup.py upp
 #ENTRYPOINT ["conda", "run", "-n", "depp_env", "/bin/bash", "-c"]
 
 RUN conda install -c "bioconda/label/cf201901" gappa
+RUN conda install gpustat
 
-#ENV DATA_DIR=/depp_test/simulated_data/ils_data/model.200.500000.0.000001/04/1/
 
-#RUN DATA_DIR="hi" && echo ${DATA_DIR}
-#RUN echo 'hii there'
-#RUN DATA=/depp_test/simulated_data/ils_data/model.200.500000.0.000001/04/1/ 
-#ENTRYPOINT ["sh", "-c","echo","${DATA}"]
-
-#ENTRYPOINT ["python","run_core.py","data_dir=/depp_test/simulated_data/ils_data/model.200.500000.0.000001/06/1/", "gpus=0", "patience=2", "val_freq=2", "min_delta=1e10", "run_amount=2", "training=False", "selection=[1,1,1,1,1,1,1,1]"]
