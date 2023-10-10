@@ -41,7 +41,10 @@ def create_placements(data_dir,output_dir, training=False, verbose=True):
                            '--allow-file-overwriting', '--fully-resolve'
                 ]
                 # subprocess.run(command)
-                subprocess.run(command, stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
+                if not verbose:
+                    subprocess.run(command, stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
+                else:
+                    subprocess.run(command)
 
 
 
