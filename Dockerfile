@@ -43,5 +43,7 @@ RUN cd ~/sepp && python setup.py upp
 #RUN conda install -c "bioconda/label/cf201901" gappa
 RUN conda install -c bioconda gappa=0.7.1
 RUN conda install gpustat
+RUN apt update 
+RUN apt install bc -y
 
 

@@ -2,6 +2,7 @@
 import os
 
 import numpy as np
+import pandas
 import pandas as pd
 import torch
 
@@ -11,7 +12,7 @@ import subprocess
 
 from depp import utils
 
-def create_baselines_from_seq(data_dir, output_dir, args):
+def create_dist_from_seq(data_dir, output_dir):
     processed_dir = os.path.join(data_dir, 'processed_data')
     seq_file = processed_dir + '/seq.fa'
     seq_dict = SeqIO.to_dict(SeqIO.parse(seq_file, "fasta"))
@@ -25,17 +26,16 @@ def create_baselines_from_seq(data_dir, output_dir, args):
     raw_seqs = np.concatenate(raw_seqs, axis=0)
 
     dist_df_ham, dist_df_jc = utils.jc_dist(raw_seqs, raw_seqs, names, names)
+    dist_df_ham.to_csv(processed_dir + '/hamming_full.csv', sep='\t')
+    dist_df_jc.to_csv(processed_dir + '/jc_full.csv', sep='\t')
 
-    # dist_dict = {}
-    # for row in seq_dict.keys():
-    #     dist_dict[row] = {}
-    #     for col in seq_dict.keys():
-    #         if col in dist_dict.keys() and row in dist_dict[col].keys():
-    #             dist_dict[row][col] = dist_dict[col][row]
-    #         else:
-    #             dist_dict[row][col] = sum(seq_dict[row][i] != seq_dict[col][i] for i in range(len(seq_dict[row])))
+def create_baselines_from_dist(data_dir, output_dir):
+    processed_dir = os.path.join(data_dir, 'processed_data')
+    seq_file = processed_dir + '/seq.fa'
+    seq_dict = SeqIO.to_dict(SeqIO.parse(seq_file, "fasta"))
+    dist_df_ham = pandas.read_csv(processed_dir + '/hamming_full.csv', sep='\t')
+    dist_df_jc = pandas.read_csv(processed_dir + '/jc_full.csv', sep='\t')
 
-            # find diistance
 
     # dist_df = pd.DataFrame.from_dict(dist_dict)
     seq_labels = list(np.loadtxt(processed_dir + '/seq_label.txt', dtype=str))
