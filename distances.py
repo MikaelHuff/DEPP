@@ -11,37 +11,47 @@ import subprocess
 
 from depp import utils
 
-def create_baselines_from_seq(data_dir, output_dir):
+def create_baselines_from_seq(data_dir, output_dir, args):
     processed_dir = os.path.join(data_dir, 'processed_data')
     seq_file = processed_dir + '/seq.fa'
-    seq = SeqIO.to_dict(SeqIO.parse(seq_file, "fasta"))
+    seq_dict = SeqIO.to_dict(SeqIO.parse(seq_file, "fasta"))
 
-    seq_len = len(seq[list(seq.keys())[0]])
-    dist_dict = {}
-    for row in seq.keys():
-        dist_dict[row] = {}
-        for col in seq.keys():
-            if col in dist_dict.keys() and row in dist_dict[col].keys():
-                dist_dict[row][col] = dist_dict[col][row]
-            else:
-                dist_dict[row][col] = sum(seq[row][i] != seq[col][i] for i in range(len(seq[row])))
+    seq_len = len(seq_dict[list(seq_dict.keys())[0]])
+    print('\t sequence amount is: ', len(seq_dict))
+    print('\t sequences length is: ', seq_len)
+
+    names = list(seq_dict.keys())
+    raw_seqs = [np.array(seq_dict[k].seq).reshape(1, -1) for k in seq_dict]
+    raw_seqs = np.concatenate(raw_seqs, axis=0)
+
+    dist_df_ham, dist_df_jc = utils.jc_dist(raw_seqs, raw_seqs, names, names)
+
+    # dist_dict = {}
+    # for row in seq_dict.keys():
+    #     dist_dict[row] = {}
+    #     for col in seq_dict.keys():
+    #         if col in dist_dict.keys() and row in dist_dict[col].keys():
+    #             dist_dict[row][col] = dist_dict[col][row]
+    #         else:
+    #             dist_dict[row][col] = sum(seq_dict[row][i] != seq_dict[col][i] for i in range(len(seq_dict[row])))
 
             # find diistance
 
-    dist_df = pd.DataFrame.from_dict(dist_dict)
+    # dist_df = pd.DataFrame.from_dict(dist_dict)
     seq_labels = list(np.loadtxt(processed_dir + '/seq_label.txt', dtype=str))
-    dist_df = dist_df.reindex(seq_labels, axis=0).reindex(seq_labels, axis=1)
+    dist_df_ham = dist_df_ham.reindex(seq_labels, axis=0).reindex(seq_labels, axis=1)
+    dist_df_jc = dist_df_jc.reindex(seq_labels, axis=0).reindex(seq_labels, axis=1)
 
-    dist_df = dist_df/seq_len
-    dist_df_jc = (-3/4) * np.log(1- (4/3) * dist_df)
+    # dist_df = dist_df/seq_len
+    # dist_df_jc = (-3/4) * np.log(1- (4/3) * dist_df)
 
 
     query_labels = np.loadtxt(processed_dir + '/query_label.txt', dtype=str)
     backbone_labels = np.loadtxt(processed_dir + '/backbone_label.txt', dtype=str)
-    dist_filtered_df = dist_df.filter(query_labels,axis=0).filter(backbone_labels, axis=1)
+    dist_filtered_df_ham = dist_df_ham.filter(query_labels,axis=0).filter(backbone_labels, axis=1)
     dist_filtered_df_jc = dist_df_jc.filter(query_labels,axis=0).filter(backbone_labels, axis=1)
 
-    dist_filtered_df.to_csv(output_dir + '/hamming.csv', sep='\t')
+    dist_filtered_df_ham.to_csv(output_dir + '/hamming.csv', sep='\t')
     dist_filtered_df_jc.to_csv(output_dir + '/jc.csv', sep='\t')
 
 

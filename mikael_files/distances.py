@@ -11,49 +11,53 @@ import subprocess
 
 from depp import utils
 
-def create_baselines_from_seq(data_dir, output_dir, training=False):
+def create_baselines_from_seq(data_dir, output_dir, args):
     processed_dir = os.path.join(data_dir, 'processed_data')
     seq_file = processed_dir + '/seq.fa'
-    seq = SeqIO.to_dict(SeqIO.parse(seq_file, "fasta"))
+    seq_dict = SeqIO.to_dict(SeqIO.parse(seq_file, "fasta"))
 
-    seq_len = len(seq[list(seq.keys())[0]])
-    dist_dict = {}
-    for row in seq.keys():
-        dist_dict[row] = {}
-        for col in seq.keys():
-            if col in dist_dict.keys() and row in dist_dict[col].keys():
-                dist_dict[row][col] = dist_dict[col][row]
-            else:
-                dist_dict[row][col] = seq_len - np.sum(np.equal(seq[row], seq[col]))
+    seq_len = len(seq_dict[list(seq_dict.keys())[0]])
+    print('\t sequence amount is: ', len(seq_dict))
+    print('\t sequences length is: ', seq_len)
+
+    names = list(seq_dict.keys())
+    raw_seqs = [np.array(seq_dict[k].seq).reshape(1, -1) for k in seq_dict]
+    raw_seqs = np.concatenate(raw_seqs, axis=0)
+
+    dist_df_ham, dist_df_jc = utils.jc_dist(raw_seqs, raw_seqs, names, names)
+
+    # dist_dict = {}
+    # for row in seq_dict.keys():
+    #     dist_dict[row] = {}
+    #     for col in seq_dict.keys():
+    #         if col in dist_dict.keys() and row in dist_dict[col].keys():
+    #             dist_dict[row][col] = dist_dict[col][row]
+    #         else:
+    #             dist_dict[row][col] = sum(seq_dict[row][i] != seq_dict[col][i] for i in range(len(seq_dict[row])))
 
             # find diistance
 
-    dist_df = pd.DataFrame.from_dict(dist_dict)
+    # dist_df = pd.DataFrame.from_dict(dist_dict)
     seq_labels = list(np.loadtxt(processed_dir + '/seq_label.txt', dtype=str))
-    dist_df = dist_df.reindex(seq_labels, axis=0).reindex(seq_labels, axis=1)
+    dist_df_ham = dist_df_ham.reindex(seq_labels, axis=0).reindex(seq_labels, axis=1)
+    dist_df_jc = dist_df_jc.reindex(seq_labels, axis=0).reindex(seq_labels, axis=1)
 
-    dist_df = dist_df/seq_len
-    dist_df_jc = (-3/4) * np.log(1- (4/3) * dist_df)
+    # dist_df = dist_df/seq_len
+    # dist_df_jc = (-3/4) * np.log(1- (4/3) * dist_df)
 
 
     query_labels = np.loadtxt(processed_dir + '/query_label.txt', dtype=str)
     backbone_labels = np.loadtxt(processed_dir + '/backbone_label.txt', dtype=str)
-    dist_filtered_df = dist_df.filter(query_labels,axis=0).filter(backbone_labels, axis=1)
+    dist_filtered_df_ham = dist_df_ham.filter(query_labels,axis=0).filter(backbone_labels, axis=1)
     dist_filtered_df_jc = dist_df_jc.filter(query_labels,axis=0).filter(backbone_labels, axis=1)
 
-    dist_filtered_df.to_csv(output_dir + '/hamming.csv', sep='\t')
+    dist_filtered_df_ham.to_csv(output_dir + '/hamming.csv', sep='\t')
     dist_filtered_df_jc.to_csv(output_dir + '/jc.csv', sep='\t')
 
-    if training:
-        output_training_dir = os.path.join(output_dir, 'training')
-        dist_training_df = dist_df.filter(backbone_labels, axis=0).filter(backbone_labels, axis=1)
-        dist_training_df_jc = dist_df_jc.filter(backbone_labels, axis=0).filter(backbone_labels, axis=1)
 
-        dist_training_df.to_csv(output_training_dir + '/hamming.csv', sep='\t')
-        dist_training_df_jc.to_csv(output_training_dir + '/jc.csv', sep='\t')
     print('\thamming/jc completed')
 
-def create_baselines_from_tree(data_dir, output_dir, training=False):
+def create_baselines_from_tree(data_dir, output_dir):
     processed_dir = os.path.join(data_dir, 'processed_data')
     tree_dir = processed_dir + '/true_tree.nwk'
     tree = treeswift.read_tree_newick(tree_dir)
@@ -74,20 +78,12 @@ def create_baselines_from_tree(data_dir, output_dir, training=False):
     dist_filtered_df.to_csv(output_dir + '/true_tree.csv', sep='\t')
 
 
-    if training:
-        dist_training_df = dist_df.filter(backbone_labels, axis=0).filter(backbone_labels, axis=1)
-        output_training_dir = os.path.join(output_dir, 'training')
-
-        dist_training_df.to_csv(output_training_dir + '/true_tree.csv', sep='\t')
     print('\ttree completed')
 
-def create_distances_from_model(data_dir, output_dir, scale, training=False, verbose=True):
+def create_distances_from_model(data_dir, output_dir, scale, verbose=True):
     models_dir = data_dir + '/models/'
     backbone_seq = data_dir + '/processed_data/backbone_seq.fa'
-    if not training:
-        query_seq = data_dir + '/processed_data/query_seq.fa'
-    else:
-        query_seq = backbone_seq
+    query_seq = data_dir + '/processed_data/query_seq.fa'
 
     for model_type in os.listdir(models_dir):
         if model_type != 'log.csv':
@@ -97,7 +93,6 @@ def create_distances_from_model(data_dir, output_dir, scale, training=False, ver
                 os.mkdir(output_type_dir)
             for model in os.listdir(type_path):
                 print('\t' + model)
-
                 model_dir = os.path.join(type_path,model)
 
                 command = ['depp_distance.py',
@@ -119,23 +114,25 @@ def create_distances_from_model(data_dir, output_dir, scale, training=False, ver
 
                 os.remove(os.path.join(output_dir,'depp.csv'))
                 # os.rename(os.path.join(output_dir,'depp.csv'), os.path.join(output_type_dir, model[:-5]+'.csv'))
+    if os.path.exists(output_dir + '/backbone_embeddings.pt'):
+        os.remove(output_dir + '/backbone_embeddings.pt')
+    if os.path.exists(output_dir + '/backbone_names.pt'):
+        os.remove(output_dir + '/backbone_names.pt')
 
-def evaluate_distances(distance_dir, run_amount=1, training=False, verbose=True):
+def evaluate_distances(distance_dir, run_amount=1, verbose=True):
     results_dict = {}
-    if not training:
-        baseline_dir = os.path.join(distance_dir,'baselines')
-    else:
-        baseline_dir = os.path.join(distance_dir, 'baselines','training')
+    baseline_dir = os.path.join(distance_dir,'baselines')
     for baseline in os.listdir(baseline_dir):
         results_dict[baseline] = {}
-        if not training:
-            depp_dir = os.path.join(distance_dir, 'depp')
-        else:
-            depp_dir = os.path.join(distance_dir, 'depp', 'training')
+        depp_dir = os.path.join(distance_dir, 'depp')
 
         for depp_type in os.listdir(depp_dir):
             if depp_type != 'training' and baseline != 'training':
                 depp_mat_dir = os.path.join(depp_dir, depp_type)
+                # print(depp_dir)
+                # print(depp_type)
+                # print(depp_mat_dir)
+                # print(os.listdir(depp_mat_dir))
                 for depp_dist in os.listdir(depp_mat_dir):
                     if not verbose:
                         print('\t' + depp_dist)
@@ -146,10 +143,7 @@ def evaluate_distances(distance_dir, run_amount=1, training=False, verbose=True)
                     results_dict[baseline][depp_dist] = float(dist)
 
     results_df = pd.DataFrame.from_dict(results_dict)
-    if not training:
-        output_file_raw = distance_dir + '/results_raw.csv'
-    else:
-        output_file_raw = distance_dir + '/training_results_raw.csv'
+    output_file_raw = distance_dir + '/results_raw.csv'
     results_df.to_csv(output_file_raw, sep='\t')
 
     results_summed_df = pd.DataFrame()
@@ -161,11 +155,9 @@ def evaluate_distances(distance_dir, run_amount=1, training=False, verbose=True)
             results_summed_df = results_summed_df.rename(index={row:row_new})
         else:
             results_summed_df.loc[row_new] += results_df.loc[row]
+
     results_averaged_df = results_summed_df/run_amount
-    if not training:
-        output_file = distance_dir + '/results_avg.csv'
-    else:
-        output_file = distance_dir + '/training_results_avg.csv'
+    output_file = distance_dir + '/results_avg.csv'
     results_averaged_df.to_csv(output_file, sep='\t')
 
 

@@ -72,7 +72,7 @@ def run_all(args, selection, training=False):
         if not os.path.exists(output_dir):
             os.mkdir(output_dir)
 
-        distances.create_baselines_from_seq(data_dir, output_dir)
+        distances.create_baselines_from_seq(data_dir, output_dir, args)
         distances.create_baselines_from_tree(data_dir, output_dir)
     print('baseline distances created')
 
@@ -142,7 +142,7 @@ def main():
     args_cli = OmegaConf.from_cli()
     args = OmegaConf.merge(args_base, args_cli)
 
-    # args.selection = [0,0, 0,0, 0, 1, 1, 1]
+    # args.selection = [1,0, 1,0, 0, 1, 1, 1]
 
     selection = {
         'prep_data': args.selection[0],

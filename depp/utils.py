@@ -245,6 +245,43 @@ def process_seq(self_seq, args, isbackbone, need_mask=False):
         return names, torch.from_numpy(seqs), torch.from_numpy(mask).bool()
     return names, torch.from_numpy(seqs)
 
+def jc_dist(seqs1_c, seqs2, names1, names2):
+    seqs1_tmp = np.zeros(seqs1_c.shape)
+    seqs2_tmp = np.zeros(seqs2.shape)
+    seqs1_tmp[seqs1_c == 'A'] = 0
+    seqs1_tmp[seqs1_c == 'C'] = 1
+    seqs1_tmp[seqs1_c == 'G'] = 2
+    seqs1_tmp[seqs1_c == 'T'] = 3
+    seqs1_tmp[seqs1_c == '-'] = 4
+    seqs2_tmp[seqs2 == 'A'] = 0
+    seqs2_tmp[seqs2 == 'C'] = 1
+    seqs2_tmp[seqs2 == 'G'] = 2
+    seqs2_tmp[seqs2 == 'T'] = 3
+    seqs2_tmp[seqs2 == '-'] = 4
+    seqs1_c = seqs1_tmp
+    seqs2 = seqs2_tmp
+
+    n2, l = seqs2.shape[0], seqs2.shape[-1]
+    seqs2 = seqs2.reshape(1, n2, -1)
+    hamming_dist = []
+    for i in range(math.ceil(len(seqs1_c) / 1000)):
+        seqs1 = seqs1_c[i * 1000: (i + 1) * 1000]
+        n1 = seqs1.shape[0]
+        seqs1 = seqs1.reshape(n1, 1, -1)
+        # breakpoint()
+        non_zero = np.logical_and(seqs1 != 4, seqs2 != 4)
+        hd = (seqs1 != seqs2) * non_zero
+        hd = np.count_nonzero(hd, axis=-1)
+        hamming_dist.append(hd / np.count_nonzero(non_zero, axis=-1))
+    hamming_dist = np.concatenate(hamming_dist, axis=0)
+    jc = - 3 / 4 * np.log(1 - 4 / 3 * hamming_dist)
+
+    hamming_df = pd.DataFrame(dict(zip(names2, hamming_dist)))
+    jc_df = pd.DataFrame(dict(zip(names2, jc)))
+    hamming_df.index = names1
+    jc_df.index = names1
+    return hamming_df, jc_df
+
 
 def get_embeddings_cluster(seqs, model, query=True, model_idx=None, only_class=False):
     with torch.no_grad():
