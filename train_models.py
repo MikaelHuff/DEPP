@@ -39,9 +39,9 @@ def train(args, data_dir, model_type='full', amount=1, base_models=None, log=sys
             # sys.exit()
             models.append(model.encoder.linear)
 
-    for file in os.listdir(model_dir):
-        if file[-3:] == 'pth':
-            os.remove(os.path.join(model_dir,file))
+        for file in os.listdir(model_dir):
+            if file[-3:] == 'pth':
+                os.remove(os.path.join(model_dir,file))
 
     return models
 
