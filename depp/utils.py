@@ -494,6 +494,7 @@ def get_embeddings(seqs, model, mask=None):
 
 
 def save_depp_dist(model, args, recon_model=None):
+    print('hi'*20)
     t1 = time.time()
     model.eval()
     print('processing data...')

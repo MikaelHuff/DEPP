@@ -74,7 +74,7 @@ def create_baselines_from_tree(data_dir, output_dir):
     query_labels = list(np.loadtxt(processed_dir + '/query_label.txt', dtype=str))
     backbone_labels = list(np.loadtxt(processed_dir + '/backbone_label.txt', dtype=str))
     num_nodes = tree.num_nodes(internal=False)
-    if  num_nodes < len(seq_labels):
+    if num_nodes < len(seq_labels):
         print('\tNot a complete tree file')
         if num_nodes == len(backbone_labels):
             print('\tOnly has backbone labels')
