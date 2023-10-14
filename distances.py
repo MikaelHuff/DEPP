@@ -25,16 +25,22 @@ def create_dist_from_seq(data_dir, output_dir):
     raw_seqs = [np.array(seq_dict[k].seq).reshape(1, -1) for k in seq_dict]
     raw_seqs = np.concatenate(raw_seqs, axis=0)
 
+    # num = 10
+    # names = names[0:num]
+    # raw_seqs = raw_seqs[0:num,0:10]
+
     dist_df_ham, dist_df_jc = utils.jc_dist(raw_seqs, raw_seqs, names, names)
     dist_df_ham.to_csv(processed_dir + '/hamming_full.csv', sep='\t')
     dist_df_jc.to_csv(processed_dir + '/jc_full.csv', sep='\t')
 
 def create_baselines_from_dist(data_dir, output_dir):
     processed_dir = os.path.join(data_dir, 'processed_data')
-    seq_file = processed_dir + '/seq.fa'
-    seq_dict = SeqIO.to_dict(SeqIO.parse(seq_file, "fasta"))
-    dist_df_ham = pandas.read_csv(processed_dir + '/hamming_full.csv', sep='\t')
-    dist_df_jc = pandas.read_csv(processed_dir + '/jc_full.csv', sep='\t')
+    # seq_file = processed_dir + '/seq.fa'
+    # seq_dict = SeqIO.to_dict(SeqIO.parse(seq_file, "fasta"))
+    dist_df_ham = pandas.read_csv(processed_dir + '/hamming_full.csv', sep='\t').set_index('Unnamed: 0')
+    dist_df_jc = pandas.read_csv(processed_dir + '/jc_full.csv', sep='\t').set_index('Unnamed: 0')
+    dist_df_ham.index = dist_df_ham.index.astype(str)
+    dist_df_jc.index = dist_df_jc.index.astype(str)
 
 
     # dist_df = pd.DataFrame.from_dict(dist_dict)
@@ -42,9 +48,9 @@ def create_baselines_from_dist(data_dir, output_dir):
     dist_df_ham = dist_df_ham.reindex(seq_labels, axis=0).reindex(seq_labels, axis=1)
     dist_df_jc = dist_df_jc.reindex(seq_labels, axis=0).reindex(seq_labels, axis=1)
 
+
     # dist_df = dist_df/seq_len
     # dist_df_jc = (-3/4) * np.log(1- (4/3) * dist_df)
-
 
     query_labels = np.loadtxt(processed_dir + '/query_label.txt', dtype=str)
     backbone_labels = np.loadtxt(processed_dir + '/backbone_label.txt', dtype=str)
