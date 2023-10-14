@@ -69,6 +69,18 @@ def create_baselines_from_tree(data_dir, output_dir):
     processed_dir = os.path.join(data_dir, 'processed_data')
     tree_dir = processed_dir + '/true_tree.nwk'
     tree = treeswift.read_tree_newick(tree_dir)
+
+    seq_labels = list(np.loadtxt(processed_dir + '/seq_label.txt', dtype=str))
+    query_labels = list(np.loadtxt(processed_dir + '/query_label.txt', dtype=str))
+    backbone_labels = list(np.loadtxt(processed_dir + '/backbone_label.txt', dtype=str))
+    num_nodes = tree.num_nodes(internal=False)
+    if  num_nodes < len(seq_labels):
+        print('\tNot a complete tree file')
+        if num_nodes == len(backbone_labels):
+            print('\tOnly has backbone labels')
+        print('\tExiting tree baseline')
+        return None
+
     dist = tree.distance_matrix()
 
     dist_df = pd.DataFrame.from_dict(dist)
@@ -77,12 +89,9 @@ def create_baselines_from_tree(data_dir, output_dir):
     dist_df.columns = dist_df.columns.astype(str)
     dist_df = dist_df.fillna(0)
     # print('\ttest1', dist_df.to_numpy()[0,0])
-    seq_labels = list(np.loadtxt(processed_dir + '/seq_label.txt', dtype=str))
     dist_df = dist_df.reindex(seq_labels, axis=0, method=None).reindex(seq_labels, axis=1, method=None)
     # print('\ttest2', dist_df.to_numpy()[0,0])
 
-    query_labels = list(np.loadtxt(processed_dir + '/query_label.txt', dtype=str))
-    backbone_labels = list(np.loadtxt(processed_dir + '/backbone_label.txt', dtype=str))
     dist_filtered_df = dist_df.filter(query_labels, axis=0).filter(backbone_labels, axis=1)
     # print('\ttest3', dist_filtered_df.to_numpy()[0,0])
 
