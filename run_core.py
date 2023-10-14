@@ -72,9 +72,9 @@ def run_all(args, selection, training=False):
         if not os.path.exists(output_dir):
             os.mkdir(output_dir)
 
-        if not training:
-            distances.create_dist_from_seq(data_dir, output_dir)
-        distances.create_baselines_from_dist(data_dir, output_dir)
+        # if not training:
+        #     distances.create_dist_from_seq(data_dir, output_dir)
+        # distances.create_baselines_from_dist(data_dir, output_dir)
         distances.create_baselines_from_tree(data_dir, output_dir)
     print('\nbaseline distances created\n')
 
