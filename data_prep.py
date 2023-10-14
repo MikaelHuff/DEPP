@@ -5,6 +5,7 @@ import numpy as np
 from Bio import SeqIO
 import dendropy
 import treeswift
+from depp import utils
 
 
 # seq = SeqIO.to_dict(SeqIO.parse(backbone_seq_file, "fasta"))
@@ -60,6 +61,27 @@ def split_sequences(output_dir):
 
     with open(output_dir + '/query_seq.fa', 'w') as handle:
         SeqIO.write(query_seq.values(), handle, 'fasta')
+
+def create_dist_from_seq(data_dir):
+    processed_dir = data_dir
+    seq_file = processed_dir + '/seq.fa'
+    seq_dict = SeqIO.to_dict(SeqIO.parse(seq_file, "fasta"))
+
+    seq_len = len(seq_dict[list(seq_dict.keys())[0]])
+    print('\t sequence amount is: ', len(seq_dict))
+    print('\t sequences length is: ', seq_len)
+
+    names = list(seq_dict.keys())
+    raw_seqs = [np.array(seq_dict[k].seq).reshape(1, -1) for k in seq_dict]
+    raw_seqs = np.concatenate(raw_seqs, axis=0)
+
+    # num = 10
+    # names = names[0:num]
+    # raw_seqs = raw_seqs[0:num,0:10]
+
+    dist_df_ham, dist_df_jc = utils.jc_dist(raw_seqs, raw_seqs, names, names)
+    dist_df_ham.to_csv(processed_dir + '/hamming_full.csv', sep='\t')
+    dist_df_jc.to_csv(processed_dir + '/jc_full.csv', sep='\t')
 
 def find_and_scale_tree(output_dir, scale=1):
     #tree_denropy = dendropy.Tree.get(path=tree_file, schema='newick')

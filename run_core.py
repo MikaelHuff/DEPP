@@ -34,6 +34,7 @@ def run_all(args, selection, training=False):
         if not training:
             data_prep.group_data(data_dir, output_dir)
             data_prep.split_sequences(output_dir)
+            data_prep.create_dist_from_seq(output_dir)
         else:
             old_data_dir = os.path.dirname(data_dir)
             data_prep.copy_data_to_training(old_data_dir, output_dir)
@@ -73,8 +74,8 @@ def run_all(args, selection, training=False):
         if not os.path.exists(output_dir):
             os.mkdir(output_dir)
 
-        if not training:
-            distances.create_dist_from_seq(data_dir, output_dir)
+        # if not training:
+        #     distances.create_dist_from_seq(data_dir, output_dir)
         distances.create_baselines_from_dist(data_dir, output_dir)
         distances.create_baselines_from_tree(data_dir, output_dir)
     print('baseline distances created\n')

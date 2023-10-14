@@ -11,26 +11,6 @@ import subprocess
 
 from depp import utils
 
-def create_dist_from_seq(data_dir, output_dir):
-    processed_dir = os.path.join(data_dir, 'processed_data')
-    seq_file = processed_dir + '/seq.fa'
-    seq_dict = SeqIO.to_dict(SeqIO.parse(seq_file, "fasta"))
-
-    seq_len = len(seq_dict[list(seq_dict.keys())[0]])
-    print('\t sequence amount is: ', len(seq_dict))
-    print('\t sequences length is: ', seq_len)
-
-    names = list(seq_dict.keys())
-    raw_seqs = [np.array(seq_dict[k].seq).reshape(1, -1) for k in seq_dict]
-    raw_seqs = np.concatenate(raw_seqs, axis=0)
-
-    # num = 10
-    # names = names[0:num]
-    # raw_seqs = raw_seqs[0:num,0:10]
-
-    dist_df_ham, dist_df_jc = utils.jc_dist(raw_seqs, raw_seqs, names, names)
-    dist_df_ham.to_csv(processed_dir + '/hamming_full.csv', sep='\t')
-    dist_df_jc.to_csv(processed_dir + '/jc_full.csv', sep='\t')
 
 def create_baselines_from_dist(data_dir, output_dir):
     processed_dir = os.path.join(data_dir, 'processed_data')
@@ -101,11 +81,11 @@ def create_baselines_from_tree(data_dir, output_dir):
     print('\ttree completed')
 
 def create_distances_from_model(data_dir, output_dir, scale, verbose=True):
-    models_dir = data_dir + '/models/'
+    models_dir = os.path.join(data_dir, 'models')
     processed_dir = os.path.join(data_dir, 'processed_data')
     backbone_seq = processed_dir + '/backbone_seq.fa'
     query_seq = processed_dir + '/query_seq.fa'
-    seq_labels = list(np.loadtxt(processed_dir + '/seq_label.txt', dtype=str))
+    # seq_labels = list(np.loadtxt(processed_dir + '/seq_label.txt', dtype=str))
 
     for model_type in os.listdir(models_dir):
         if model_type != 'log.csv':
@@ -128,15 +108,17 @@ def create_distances_from_model(data_dir, output_dir, scale, verbose=True):
                 else:
                     subprocess.run(command)
 
-                dist_df = pd.read_csv(os.path.join(output_dir,'depp.csv'), sep='\t').set_index('Unnamed: 0') / scale
-                dist_df.index.name = ''
+                dist_df = pd.read_csv(os.path.join(output_dir,'depp.csv'), sep='\t').set_index('Unnamed: 0')/scale
+                # dist_df.index.name = ''
+                dist_df.index = dist_df.index.astype(str).rename('')
+                dist_df.columns = dist_df.columns.astype(str)
                 # print(dist_df.index.name)
                 # print(dist_df.columns)
-                dist_df = dist_df.reindex(seq_labels, axis=0).reindex(seq_labels, axis=1)
                 query_labels = np.loadtxt(processed_dir + '/query_label.txt', dtype=str)
                 backbone_labels = np.loadtxt(processed_dir + '/backbone_label.txt', dtype=str)
-                dist_filtered_df = dist_df.filter(query_labels, axis=0).filter(backbone_labels, axis=1)
-                dist_filtered_df.to_csv(os.path.join(output_type_dir, model[:-5]+'.csv'), sep='\t')
+                dist_sorted_df = dist_df.reindex(query_labels, axis=0).reindex(backbone_labels, axis=1)
+                # dist_filtered_df = dist_df.filter(query_labels, axis=0).filter(backbone_labels, axis=1)
+                dist_sorted_df.to_csv(os.path.join(output_type_dir, model[:-5]+'.csv'), sep='\t')
 
                 os.remove(os.path.join(output_dir,'depp.csv'))
                 # os.rename(os.path.join(output_dir,'depp.csv'), os.path.join(output_type_dir, model[:-5]+'.csv'))
@@ -160,7 +142,7 @@ def evaluate_distances(distance_dir, run_amount=1, verbose=True):
                 # print(depp_mat_dir)
                 # print(os.listdir(depp_mat_dir))
                 for depp_dist in os.listdir(depp_mat_dir):
-                    if not verbose:
+                    if verbose:
                         print('\t' + depp_dist)
                     baseline_mat = np.genfromtxt(baseline_dir + '/' + baseline, delimiter='\t')[1:,1:]
                     depp_mat = np.genfromtxt(depp_mat_dir + '/' + depp_dist, delimiter='\t')[1:,1:]
