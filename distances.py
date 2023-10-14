@@ -24,9 +24,9 @@ def create_dist_from_seq(data_dir, output_dir):
     raw_seqs = [np.array(seq_dict[k].seq).reshape(1, -1) for k in seq_dict]
     raw_seqs = np.concatenate(raw_seqs, axis=0)
 
-    num = 10
-    names = names[0:num]
-    raw_seqs = raw_seqs[0:num,0:10]
+    # num = 10
+    # names = names[0:num]
+    # raw_seqs = raw_seqs[0:num,0:10]
 
     dist_df_ham, dist_df_jc = utils.jc_dist(raw_seqs, raw_seqs, names, names)
     dist_df_ham.to_csv(processed_dir + '/hamming_full.csv', sep='\t')
@@ -44,7 +44,7 @@ def create_baselines_from_dist(data_dir, output_dir):
 
     # dist_df = pd.DataFrame.from_dict(dist_dict)
     seq_labels = list(np.loadtxt(processed_dir + '/seq_label.txt', dtype=str))
-    seq_labels = seq_labels[0:10]
+    # seq_labels = seq_labels[0:10]
     dist_df_ham = dist_df_ham.reindex(seq_labels, axis=0).reindex(seq_labels, axis=1)
     dist_df_jc = dist_df_jc.reindex(seq_labels, axis=0).reindex(seq_labels, axis=1)
 
