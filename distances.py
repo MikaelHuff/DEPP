@@ -36,10 +36,10 @@ def create_baselines_from_dist(data_dir, output_dir):
     processed_dir = os.path.join(data_dir, 'processed_data')
     # seq_file = processed_dir + '/seq.fa'
     # seq_dict = SeqIO.to_dict(SeqIO.parse(seq_file, "fasta"))
-    dist_df_ham = pd.read_csv(processed_dir + '/hamming_full.csv', sep='\t').set_index('Unnamed: 0').index.rename('', inplace=True)
-    dist_df_jc = pd.read_csv(processed_dir + '/jc_full.csv', sep='\t').set_index('Unnamed: 0').index.rename('', inplace=True)
-    dist_df_ham.index = dist_df_ham.index.astype(str)
-    dist_df_jc.index = dist_df_jc.index.astype(str)
+    dist_df_ham = pd.read_csv(processed_dir + '/hamming_full.csv', sep='\t').set_index('Unnamed: 0')
+    dist_df_jc = pd.read_csv(processed_dir + '/jc_full.csv', sep='\t').set_index('Unnamed: 0')
+    dist_df_ham.index = dist_df_ham.index.astype(str).rename('')
+    dist_df_jc.index = dist_df_jc.index.astype(str).rename('')
 
 
     # dist_df = pd.DataFrame.from_dict(dist_dict)
