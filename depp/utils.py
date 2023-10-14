@@ -10,7 +10,7 @@ import dendropy
 import csv
 import time
 import json
-import scipy.stats
+# import scipy.stats
 from Bio import SeqIO
 
 
@@ -329,6 +329,7 @@ def save_dataframe(data_origin, outfile):
 
 # @profile
 def save_depp_dist_cluster(model, args, use_cluster=None, recon_model=None):
+    import scipy.stats
     t1 = time.time()
     os.makedirs(args.outdir, exist_ok=True)
     query_seq_file = args.query_seq_file
