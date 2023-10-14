@@ -44,7 +44,7 @@ RUN conda install -c bioconda gappa=0.7.1
 RUN conda install gpustat
 RUN apt update 
 RUN apt install bc -y
-ENV PYTHONUNBUFFERED=1
-#RUN pip3 install torch==1.9.0+cu111 torchvision==0.10.0+cu111 torchaudio==0.9.0 -f https://download.pytorch.org/whl/torch_stable.html
+#ENV PYTHONUNBUFFERED=1
+RUN pip3 install torch==1.9.0+cu111 torchvision==0.10.0+cu111 torchaudio==0.9.0 -f https://download.pytorch.org/whl/torch_stable.html
 
 

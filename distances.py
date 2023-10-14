@@ -54,8 +54,8 @@ def create_baselines_from_dist(data_dir, output_dir):
 
     query_labels = np.loadtxt(processed_dir + '/query_label.txt', dtype=str)
     backbone_labels = np.loadtxt(processed_dir + '/backbone_label.txt', dtype=str)
-    query_labels = seq_labels[0:2]
-    backbone_labels = seq_labels[2:10]
+    # query_labels = seq_labels[0:2]
+    # backbone_labels = seq_labels[2:10]
     dist_filtered_df_ham = dist_df_ham.filter(query_labels,axis=0).filter(backbone_labels, axis=1)
     dist_filtered_df_jc = dist_df_jc.filter(query_labels,axis=0).filter(backbone_labels, axis=1)
 
@@ -102,9 +102,10 @@ def create_baselines_from_tree(data_dir, output_dir):
 
 def create_distances_from_model(data_dir, output_dir, scale, verbose=True):
     models_dir = data_dir + '/models/'
-    backbone_seq = data_dir + '/processed_data/backbone_seq.fa'
-    query_seq = data_dir + '/processed_data/query_seq.fa'
-    seq_labels = list(np.loadtxt(data_dir + '/processed_data/seq_label.txt', dtype=str))
+    processed_dir = os.path.join(data_dir, 'processed_data')
+    backbone_seq = processed_dir + '/backbone_seq.fa'
+    query_seq = processed_dir + '/query_seq.fa'
+    seq_labels = list(np.loadtxt(processed_dir + '/seq_label.txt', dtype=str))
 
     for model_type in os.listdir(models_dir):
         if model_type != 'log.csv':
@@ -132,7 +133,10 @@ def create_distances_from_model(data_dir, output_dir, scale, verbose=True):
                 # print(dist_df.index.name)
                 # print(dist_df.columns)
                 dist_df = dist_df.reindex(seq_labels, axis=0).reindex(seq_labels, axis=1)
-                dist_df.to_csv(os.path.join(output_type_dir, model[:-5]+'.csv'), sep='\t')
+                query_labels = np.loadtxt(processed_dir + '/query_label.txt', dtype=str)
+                backbone_labels = np.loadtxt(processed_dir + '/backbone_label.txt', dtype=str)
+                dist_filtered_df = dist_df.filter(query_labels, axis=0).filter(backbone_labels, axis=1)
+                dist_filtered_df.to_csv(os.path.join(output_type_dir, model[:-5]+'.csv'), sep='\t')
 
                 os.remove(os.path.join(output_dir,'depp.csv'))
                 # os.rename(os.path.join(output_dir,'depp.csv'), os.path.join(output_type_dir, model[:-5]+'.csv'))

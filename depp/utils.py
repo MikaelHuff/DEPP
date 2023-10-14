@@ -113,7 +113,7 @@ def distance(nodes1, nodes2, mode):
 
 
 def mse_loss(model_dist, true_dist, weighted_method):
-    assert model_dist.shape == true_dist.shape
+    assert model_dist.shape == true_dist.shape, str(model_dist.shape) + str(true_dist.shape)
     if weighted_method == 'ols':
         return ((model_dist - true_dist) ** 2).mean()
     elif weighted_method == 'fm':
