@@ -91,6 +91,7 @@ def create_baselines_from_tree(data_dir, output_dir):
 
 
     print('\ttree completed')
+    raise NotImplementedError
 
 def create_distances_from_model(data_dir, output_dir, scale, verbose=True):
     models_dir = data_dir + '/models/'
