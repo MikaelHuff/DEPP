@@ -38,7 +38,7 @@ def run_all(args, selection, training=False):
             data_prep.copy_data_to_training(old_data_dir, output_dir)
 
         data_prep.find_and_scale_tree(output_dir, scale=tree_scaling)
-    print('\ndata preperation completed\n')
+    print('data preperation completed\n')
 
 
     run_amount = args.run_amount
@@ -59,7 +59,7 @@ def run_all(args, selection, training=False):
             train_models.train(args, data_dir, 'no5-mer', amount=run_amount, log=f, verbose=verbose)
             models = train_models.train(args, data_dir, 'base', amount=run_amount, log=f, verbose=verbose)
             train_models.train(args, data_dir, model_type='dual', amount=run_amount, base_models=models, log=f, verbose=verbose)
-    print('\ndepp models trained\n')
+    print('depp models trained\n')
 
 
     distance_dir = data_dir + '/distances/'
@@ -72,11 +72,11 @@ def run_all(args, selection, training=False):
         if not os.path.exists(output_dir):
             os.mkdir(output_dir)
 
-        # if not training:
-        #     distances.create_dist_from_seq(data_dir, output_dir)
-        # distances.create_baselines_from_dist(data_dir, output_dir)
+        if not training:
+            distances.create_dist_from_seq(data_dir, output_dir)
+        distances.create_baselines_from_dist(data_dir, output_dir)
         distances.create_baselines_from_tree(data_dir, output_dir)
-    print('\nbaseline distances created\n')
+    print('baseline distances created\n')
 
 
 
@@ -86,12 +86,12 @@ def run_all(args, selection, training=False):
         if not os.path.exists(output_dir):
             os.mkdir(output_dir)
         distances.create_distances_from_model(data_dir, output_dir, tree_scaling, verbose=verbose)
-    print('\ndepp distances created\n')
+    print('depp distances created\n')
 
     # evaluate disttances
     if selection['evaluate_distances']:
         distances.evaluate_distances(distance_dir, run_amount=run_amount, verbose=verbose)
-    print('\ndistances evaluated\n')
+    print('distances evaluated\n')
 
     placement_dir = os.path.join(data_dir, 'placements')
     # crreate placements
@@ -99,13 +99,13 @@ def run_all(args, selection, training=False):
         if not os.path.exists(placement_dir):
             os.mkdir(placement_dir)
         placements.create_placements(data_dir, placement_dir, verbose=verbose)
-    print('\nplacements created\n')
+    print('placements created\n')
 
 
     # evaluuate placements
     if selection['evaluate_placements']:
         placements.evaluate_placements(data_dir, placement_dir, run_amount=run_amount)
-    print('\nplacements evaluated\n')
+    print('placements evaluated\n')
 
 
     # gather results to one place
@@ -134,7 +134,7 @@ def run_all(args, selection, training=False):
         if not training:
             shutil.copy(os.path.join(data_dir, 'placements') + '/results_raw.csv', result_dir + '/placement_evaluations_all.csv')
             shutil.copy(os.path.join(data_dir, 'placements') + '/results_avg.csv', result_dir + '/placement_evaluations_avg.csv')
-        print('\nresults grouped in ' + result_dir)
+        print('results grouped in ' + result_dir)
 
 
 

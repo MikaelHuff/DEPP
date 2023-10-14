@@ -2,7 +2,6 @@
 import os
 
 import numpy as np
-import pandas
 import pandas as pd
 import torch
 
@@ -37,8 +36,8 @@ def create_baselines_from_dist(data_dir, output_dir):
     processed_dir = os.path.join(data_dir, 'processed_data')
     # seq_file = processed_dir + '/seq.fa'
     # seq_dict = SeqIO.to_dict(SeqIO.parse(seq_file, "fasta"))
-    dist_df_ham = pandas.read_csv(processed_dir + '/hamming_full.csv', sep='\t').set_index('Unnamed: 0').index.rename('', inplace=True)
-    dist_df_jc = pandas.read_csv(processed_dir + '/jc_full.csv', sep='\t').set_index('Unnamed: 0').index.rename('', inplace=True)
+    dist_df_ham = pd.read_csv(processed_dir + '/hamming_full.csv', sep='\t').set_index('Unnamed: 0').index.rename('', inplace=True)
+    dist_df_jc = pd.read_csv(processed_dir + '/jc_full.csv', sep='\t').set_index('Unnamed: 0').index.rename('', inplace=True)
     dist_df_ham.index = dist_df_ham.index.astype(str)
     dist_df_jc.index = dist_df_jc.index.astype(str)
 
@@ -77,21 +76,20 @@ def create_baselines_from_tree(data_dir, output_dir):
     dist_df.index = dist_df.index.astype(str)
     dist_df.columns = dist_df.columns.astype(str)
     dist_df = dist_df.fillna(0)
-    print('\ttest1', dist_df.to_numpy()[0,0])
+    # print('\ttest1', dist_df.to_numpy()[0,0])
     seq_labels = list(np.loadtxt(processed_dir + '/seq_label.txt', dtype=str))
-    dist_df = dist_df.reindex(seq_labels, axis=0).reindex(seq_labels, axis=1)
-    print('\ttest2', dist_df.to_numpy()[0,0])
+    dist_df = dist_df.reindex(seq_labels, axis=0, method=None).reindex(seq_labels, axis=1, method=None)
+    # print('\ttest2', dist_df.to_numpy()[0,0])
 
-    query_labels = np.loadtxt(processed_dir + '/query_label.txt', dtype=str)
-    backbone_labels = np.loadtxt(processed_dir + '/backbone_label.txt', dtype=str)
+    query_labels = list(np.loadtxt(processed_dir + '/query_label.txt', dtype=str))
+    backbone_labels = list(np.loadtxt(processed_dir + '/backbone_label.txt', dtype=str))
     dist_filtered_df = dist_df.filter(query_labels, axis=0).filter(backbone_labels, axis=1)
-    print('\ttest3', dist_filtered_df.to_numpy()[0,0])
+    # print('\ttest3', dist_filtered_df.to_numpy()[0,0])
 
     dist_filtered_df.to_csv(output_dir + '/true_tree.csv', sep='\t')
 
 
     print('\ttree completed')
-    raise NotImplementedError
 
 def create_distances_from_model(data_dir, output_dir, scale, verbose=True):
     models_dir = data_dir + '/models/'

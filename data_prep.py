@@ -31,11 +31,11 @@ def group_data(data_dir, output_dir):
 
     tree_file = ''
     for file in os.listdir(data_dir):
-        if 'bestTree' in file:
+        if 'tree' in file and 'best' not in file:
             tree_file = data_dir + '/' + file
     if tree_file == '':
         for file in os.listdir(os.path.dirname(data_dir)):
-            if 'bestTree' in file:
+            if 'tree' in file and 'best' not in file:
                 tree_file = data_dir + '/' + file
     shutil.copy(tree_file,output_dir + '/true_tree.nwk')
 
