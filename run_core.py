@@ -13,6 +13,7 @@ from depp import default_config
 
 
 def run_all(args, selection, training=False):
+    print('')
     root_dir = args.data_dir
     if not training:
         data_dir = root_dir
