@@ -97,16 +97,17 @@ def find_and_scale_tree(data_dir, output_dir, scale=1, verbose=True):
         tree_true = treeswift.read_tree_newick(processed_dir + '/true_tree.newick')
     else:
         tree_true = tree
+        tree_true.write_tree_newick(processed_dir + '/true_tree.newick')
     # tree_test = treeswift.read_tree_newick(tree_output_dir)
 
     backbone_file = processed_dir + '/backbone_label.txt'
     backbone_labels = np.loadtxt(backbone_file, dtype=str)
     tree_backbone = tree_true.extract_tree_with(backbone_labels)
-    tree_backbone.write_tree_newick(processed_dir + '/backbone_tree.nwk')
+    tree_backbone.write_tree_newick(processed_dir + '/backbone_tree.newick')
 
     tree_scaled = tree_backbone
     tree_scaled.scale_edges(scale)
-    tree_scaled.write_tree_newick(processed_dir + '/scaled_tree.nwk')
+    tree_scaled.write_tree_newick(processed_dir + '/scaled_tree.newick')
 
 
 def create_baselines_from_tree(data_dir, output_dir):

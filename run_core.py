@@ -84,7 +84,7 @@ def run_all(args, selection, training=False):
 
 
 
-    #createt depp diisttances
+    #create depp distances
     if selection['create_depp_distances']:
         output_dir = distance_dir + '/depp/'
         if not os.path.exists(output_dir):
@@ -92,13 +92,13 @@ def run_all(args, selection, training=False):
         distances.create_distances_from_model(data_dir, output_dir, tree_scaling, verbose=verbose)
     print('depp distances created\n')
 
-    # evaluate disttances
+    # evaluate distances
     if selection['evaluate_distances']:
         distances.evaluate_distances(distance_dir, run_amount=run_amount, verbose=verbose)
     print('distances evaluated\n')
 
     placement_dir = os.path.join(data_dir, 'placements')
-    # crreate placements
+    # create placements
     if selection['create_placements']:
         if not os.path.exists(placement_dir):
             os.mkdir(placement_dir)

@@ -96,7 +96,7 @@ def copy_data_to_training(data_dir, output_dir):
     shutil.copy(old_data_dir + '/seq_label.txt', output_dir + '/seq_label.txt')
     shutil.copy(old_data_dir + '/seq.fa', output_dir + '/seq.fa')
 
-    shutil.copy(old_data_dir + '/true_tree.nwk', output_dir + '/true_tree.nwk')
+    shutil.copy(old_data_dir + '/true_tree.newick', output_dir + '/true_tree.newick')
 
     shutil.copy(old_data_dir + '/hamming_full.csv', output_dir + '/hamming_full.csv')
     shutil.copy(old_data_dir + '/jc_full.csv', output_dir + '/jc_full.csv')

@@ -15,7 +15,7 @@ def create_placements(data_dir, output_dir, verbose=True):
     if not os.path.exists(placement_tree_dir):
         os.mkdir(placement_tree_dir)
 
-    tree_file = os.path.join(data_dir, 'processed_data') + '/backbone_tree.nwk'
+    tree_file = os.path.join(data_dir, 'processed_data') + '/backbone_tree.newick'
     for dist_type in os.listdir(dist_dir):
         dist_type_dir = os.path.join(dist_dir, dist_type)
         if os.path.isdir(dist_type_dir):
@@ -48,30 +48,30 @@ def create_placements(data_dir, output_dir, verbose=True):
 
 
 
-def evaluate_placements(data_dir, placement_dir, run_amount=1, training=False):
+def evaluate_placements(data_dir, placement_dir, run_amount=1):
     tree_dir = os.path.join(placement_dir, 'placement_trees')
-
     processed_dir = os.path.join(data_dir, 'processed_data')
-    true_tree_file = processed_dir + '/true_tree.nwk'
+    true_tree_file = processed_dir + '/true_tree.newick'
     # query_file = processed_dir + '/query_label.txt'
     query_file = processed_dir + '/query_seq.fa'
-    backbone_tree_file = processed_dir + '/backbone_tree.nwk'
+    backbone_tree_file = processed_dir + '/backbone_tree.newick'
 
     script_file = os.getcwd() + '/evaluate_placement.sh'
     # print(script_file)
     output_dir = os.path.join(placement_dir, 'evaluations')
     if not os.path.exists(output_dir):
         os.mkdir(output_dir)
-    for tree in os.listdir(tree_dir):
-        print('\t' + tree)
+    for tree_file in os.listdir(tree_dir):
+        print('\t' + tree_file)
+        tree_file_full = tree_dir + '/' + tree_file
         command = ['bash',
                    script_file,
                    true_tree_file,
-                   tree_dir + '/' + tree,
+                   tree_file_full,
                    query_file,
                    backbone_tree_file
         ]
-        output_file = output_dir + '/' + tree[:-7] + '.csv'
+        output_file = output_dir + '/' + tree_file[:-7] + '.csv'
         with open(output_file, 'w') as f:
             subprocess.run(command, stdout=f)
         with open(output_file, 'r+') as f:
