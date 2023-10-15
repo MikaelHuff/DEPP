@@ -45,6 +45,70 @@ def create_baselines_from_dist(data_dir, output_dir):
 
     print('\thamming/jc completed')
 
+
+def find_and_scale_tree(data_dir, output_dir, scale=1, verbose=True):
+    #tree_denropy = dendropy.Tree.get(path=tree_file, schema='newick')
+    processed_dir = os.path.join(data_dir, 'processed_data')
+
+    tree_file = ''
+    for file in os.listdir(data_dir):
+        if 'bestTree' in file:
+            tree_file = data_dir + '/' + file
+    if tree_file == '':
+        for file in os.listdir(os.path.dirname(data_dir)):
+            if 'bestTree' in file:
+                tree_file = data_dir + '/' + file
+
+    tree = treeswift.read_tree_newick(tree_file)
+    num_nodes = tree.num_nodes(internal=False)
+    # query_labels = processed_dir + '/query_labels.txt'
+    # backbone_labels = processed_dir + '/backbone_labels.txt'
+    # dist_full = pd.read_csv(processed_dir + '/jc_full.csv', sep='\t').set_index('Unnamed: 0')
+    # dist_full.index = dist_full.index.rename('')
+    # dist_filtered = dist_full.reindex(query_labels, axis=0).reindex(backbone_labels, axis=1)
+    dist_dir = output_dir + '/jc.csv'
+    # dist_filtered.to_csv(dist_dir)
+
+    seq_labels = list(np.loadtxt(processed_dir + '/seq_label.txt', dtype=str))
+    if num_nodes < len(seq_labels):
+        jplace_file = processed_dir + '/true_tree.jplace'
+        command = ['run_apples.py',
+                   '-d', dist_dir,
+                   '-t', tree_file,
+                   '-o', jplace_file
+                   ]
+
+        if not verbose:
+            subprocess.run(command, stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
+        else:
+            subprocess.run(command)
+
+        command2 = ['gappa', 'examine', 'graft',
+                   '--jplace-path', jplace_file,
+                   '--out-dir', processed_dir,
+                   '--allow-file-overwriting', '--fully-resolve'
+                   ]
+
+        if not verbose:
+            subprocess.run(command2, stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
+        else:
+            subprocess.run(command2)
+        # tree_file = tree_output_dir
+        tree_true = treeswift.read_tree_newick(processed_dir + '/true_tree.newick')
+    else:
+        tree_true = tree
+    # tree_test = treeswift.read_tree_newick(tree_output_dir)
+
+    backbone_file = processed_dir + '/backbone_label.txt'
+    backbone_labels = np.loadtxt(backbone_file, dtype=str)
+    tree_backbone = tree_true.extract_tree_with(backbone_labels)
+    tree_backbone.write_tree_newick(processed_dir + '/backbone_tree.nwk')
+
+    tree_scaled = tree_backbone
+    tree_scaled.scale_edges(scale)
+    tree_scaled.write_tree_newick(processed_dir + '/scaled_tree.nwk')
+
+
 def create_baselines_from_tree(data_dir, output_dir):
     processed_dir = os.path.join(data_dir, 'processed_data')
     tree_dir = processed_dir + '/true_tree.nwk'
@@ -59,7 +123,7 @@ def create_baselines_from_tree(data_dir, output_dir):
         if num_nodes == len(backbone_labels):
             print('\tOnly has backbone labels')
         print('\tExiting tree baseline')
-        return None
+        assert num_nodes == len(seq_labels),'Not a complete tree file'
 
     dist = tree.distance_matrix()
 

@@ -2,10 +2,14 @@
 import os
 import shutil
 import numpy as np
+import pandas as pd
 from Bio import SeqIO
 import dendropy
 import treeswift
+import subprocess
+
 from depp import utils
+
 
 
 # seq = SeqIO.to_dict(SeqIO.parse(backbone_seq_file, "fasta"))
@@ -30,15 +34,7 @@ def group_data(data_dir, output_dir):
     shutil.copy(query_file,output_dir+'/query_label.txt')
 
 
-    tree_file = ''
-    for file in os.listdir(data_dir):
-        if 'bestTree' in file:
-            tree_file = data_dir + '/' + file
-    if tree_file == '':
-        for file in os.listdir(os.path.dirname(data_dir)):
-            if 'bestTree' in file:
-                tree_file = data_dir + '/' + file
-    shutil.copy(tree_file,output_dir + '/true_tree.nwk')
+
 
 def split_sequences(output_dir):
     seq_file = output_dir + '/seq.fa'
@@ -62,6 +58,7 @@ def split_sequences(output_dir):
     with open(output_dir + '/query_seq.fa', 'w') as handle:
         SeqIO.write(query_seq.values(), handle, 'fasta')
 
+
 def create_dist_from_seq(data_dir):
     processed_dir = data_dir
     seq_file = processed_dir + '/seq.fa'
@@ -83,18 +80,7 @@ def create_dist_from_seq(data_dir):
     dist_df_ham.to_csv(processed_dir + '/hamming_full.csv', sep='\t')
     dist_df_jc.to_csv(processed_dir + '/jc_full.csv', sep='\t')
 
-def find_and_scale_tree(output_dir, scale=1):
-    #tree_denropy = dendropy.Tree.get(path=tree_file, schema='newick')
-    tree_file = output_dir + '/true_tree.nwk'
-    tree = treeswift.read_tree_newick(tree_file)
 
-    backbone_file = output_dir + '/backbone_label.txt'
-    backbone = np.loadtxt(backbone_file, dtype=str)
-    tree = tree.extract_tree_with(backbone)
-    tree.write_tree_newick(output_dir + '/backbone_tree.nwk')
-
-    tree.scale_edges(scale)
-    tree.write_tree_newick(output_dir + '/scaled_tree.nwk')
 
 
 def copy_data_to_training(data_dir, output_dir):

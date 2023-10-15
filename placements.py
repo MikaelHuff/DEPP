@@ -4,7 +4,7 @@ import pandas as pd
 
 import subprocess
 
-def create_placements(data_dir,output_dir, training=False, verbose=True):
+def create_placements(data_dir, output_dir, verbose=True):
     dist_dir = os.path.join(data_dir, 'distances', 'depp')
     apple_dir = os.path.join(output_dir, 'apples')
 
@@ -28,7 +28,7 @@ def create_placements(data_dir,output_dir, training=False, verbose=True):
                            '-t', tree_file,
                            '-o', jplace_file
                 ]
-
+                #command = ['run_apples.py', '-d', dist_type_dir + '/' + dist_mat, '-t', tree_file, '-o', jplace_file]
 
                 if not verbose:
                     subprocess.run(command, stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
@@ -89,8 +89,8 @@ def evaluate_placements(data_dir, placement_dir, run_amount=1, training=False):
         f.write('Model\tError Amount\tError/Bipartition\n')
         for file in os.listdir(output_dir):
             result_df = pd.read_csv(output_dir + '/' + file, sep=' ')
-            error = list(result_df.sum(axis=0)[2:])
-            f.write(file[:-4]+ '\t' + str(error[0]) + '\t' + str(error[1]) + '\n')
+            error = list(result_df.sum(axis=0))
+            f.write(file[:-4]+ '\t' + str(error[2]) + '\t' + str(error[2]/error[1]) + '\n')
 
     results_df = pd.read_csv(results_file, sep='\t').set_index('Model')
     results_summed_df = pd.DataFrame()

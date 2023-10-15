@@ -35,11 +35,11 @@ def run_all(args, selection, training=False):
             data_prep.group_data(data_dir, output_dir)
             data_prep.split_sequences(output_dir)
             data_prep.create_dist_from_seq(output_dir)
+            # data_prep.find_and_scale_tree(data_dir, output_dir, scale=tree_scaling, verbose=verbose)
         else:
             old_data_dir = os.path.dirname(data_dir)
             data_prep.copy_data_to_training(old_data_dir, output_dir)
 
-        data_prep.find_and_scale_tree(output_dir, scale=tree_scaling)
     print('data preperation completed\n')
 
 
@@ -77,6 +77,8 @@ def run_all(args, selection, training=False):
         # if not training:
         #     distances.create_dist_from_seq(data_dir, output_dir)
         distances.create_baselines_from_dist(data_dir, output_dir)
+        if not training:
+            distances.find_and_scale_tree(data_dir, output_dir, scale=tree_scaling, verbose=verbose)
         distances.create_baselines_from_tree(data_dir, output_dir)
     print('baseline distances created\n')
 
