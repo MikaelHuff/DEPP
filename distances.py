@@ -111,7 +111,7 @@ def find_and_scale_tree(data_dir, output_dir, scale=1, verbose=True):
 
 def create_baselines_from_tree(data_dir, output_dir):
     processed_dir = os.path.join(data_dir, 'processed_data')
-    tree_dir = processed_dir + '/true_tree.nwk'
+    tree_dir = processed_dir + '/true_tree.newick'
     tree = treeswift.read_tree_newick(tree_dir)
 
     seq_labels = list(np.loadtxt(processed_dir + '/seq_label.txt', dtype=str))
