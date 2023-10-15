@@ -43,27 +43,6 @@ def run_all(args, selection, training=False):
     print('data preperation completed\n')
 
 
-    run_amount = args.run_amount
-    # train models
-    if selection['create_models']:
-        model_dir = data_dir + '/models/'
-        if not os.path.exists(model_dir):
-            os.mkdir(model_dir)
-
-        # base, full, dual, no-5mer
-        log_dir = model_dir + 'log.csv'
-        if os.path.exists(log_dir):
-            os.remove(log_dir)
-
-        with open(log_dir, 'x') as f:
-            f.write('model name\tfinal epoch\tfinal loss\n')
-            train_models.train(args, data_dir, 'full', amount=run_amount, log=f, verbose=verbose)
-            train_models.train(args, data_dir, 'no5-mer', amount=run_amount, log=f, verbose=verbose)
-            models = train_models.train(args, data_dir, 'base', amount=run_amount, log=f, verbose=verbose)
-            train_models.train(args, data_dir, model_type='dual', amount=run_amount, base_models=models, log=f, verbose=verbose)
-    print('depp models trained\n')
-
-
     distance_dir = data_dir + '/distances/'
     if not os.path.exists(distance_dir):
         os.mkdir(distance_dir)
@@ -81,6 +60,27 @@ def run_all(args, selection, training=False):
             distances.find_and_scale_tree(data_dir, output_dir, scale=tree_scaling, verbose=verbose)
         distances.create_baselines_from_tree(data_dir, output_dir)
     print('baseline distances created\n')
+
+    run_amount = args.run_amount
+    # train models
+    if selection['create_models']:
+        model_dir = data_dir + '/models/'
+        if not os.path.exists(model_dir):
+            os.mkdir(model_dir)
+
+        # base, full, dual, no-5mer
+        log_dir = model_dir + 'log.csv'
+        if os.path.exists(log_dir):
+            os.remove(log_dir)
+
+        with open(log_dir, 'x') as f:
+            f.write('model name\tfinal epoch\tfinal loss\n')
+            train_models.train(args, data_dir, 'full', amount=run_amount, log=f, verbose=verbose)
+            train_models.train(args, data_dir, 'no5-mer', amount=run_amount, log=f, verbose=verbose)
+            models = train_models.train(args, data_dir, 'base', amount=run_amount, log=f, verbose=verbose)
+            train_models.train(args, data_dir, model_type='dual', amount=run_amount, base_models=models, log=f,
+                               verbose=verbose)
+    print('depp models trained\n')
 
 
 
@@ -152,8 +152,8 @@ def main():
 
     selection = {
         'prep_data': args.selection[0],
-        'create_models': args.selection[1],
-        'create_base_distances': args.selection[2],
+        'create_base_distances': args.selection[1],
+        'create_models': args.selection[2],
         'create_depp_distances': args.selection[3],
         'evaluate_distances': args.selection[4],
         'create_placements': args.selection[5],
