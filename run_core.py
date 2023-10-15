@@ -86,7 +86,7 @@ def run_all(args, selection, training=False):
 
     #create depp distances
     if selection['create_depp_distances']:
-        output_dir = distance_dir + '/depp/'
+        output_dir = os.path.join(distance_dir, 'depp')
         if not os.path.exists(output_dir):
             os.mkdir(output_dir)
         distances.create_distances_from_model(data_dir, output_dir, tree_scaling, verbose=verbose)
