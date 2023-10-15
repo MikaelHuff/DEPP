@@ -173,6 +173,9 @@ def create_distances_from_model(data_dir, output_dir, scale, verbose=True):
                 else:
                     subprocess.run(command)
 
+                import time
+                time.sleep(100000)
+
                 dist_df = pd.read_csv(os.path.join(output_dir,'depp.csv'), sep='\t').set_index('Unnamed: 0')/scale
                 # dist_df.index.name = ''
                 dist_df.index = dist_df.index.astype(str).rename('')
