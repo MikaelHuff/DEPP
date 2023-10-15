@@ -195,6 +195,8 @@ def evaluate_distances(distance_dir, run_amount=1, verbose=True):
     results_dict = {}
     baseline_dir = os.path.join(distance_dir,'baselines')
     for baseline in os.listdir(baseline_dir):
+        if verbose:
+            print('\t' + baseline)
         results_dict[baseline] = {}
         depp_dir = os.path.join(distance_dir, 'depp')
 
@@ -207,7 +209,7 @@ def evaluate_distances(distance_dir, run_amount=1, verbose=True):
                 # print(os.listdir(depp_mat_dir))
                 for depp_dist in os.listdir(depp_mat_dir):
                     if verbose:
-                        print('\t' + depp_dist)
+                        print('\t\t' + depp_dist)
                     baseline_mat = np.genfromtxt(baseline_dir + '/' + baseline, delimiter='\t')[1:,1:]
                     depp_mat = np.genfromtxt(depp_mat_dir + '/' + depp_dist, delimiter='\t')[1:,1:]
 

@@ -50,7 +50,6 @@ def create_placements(data_dir, output_dir, verbose=True):
 
 def evaluate_placements(data_dir, placement_dir, run_amount=1, training=False):
     tree_dir = os.path.join(placement_dir, 'placement_trees')
-    evaluations_dir = os.path.join(placement_dir, 'evaluations')
 
     processed_dir = os.path.join(data_dir, 'processed_data')
     true_tree_file = processed_dir + '/true_tree.nwk'
@@ -90,7 +89,7 @@ def evaluate_placements(data_dir, placement_dir, run_amount=1, training=False):
         for file in os.listdir(output_dir):
             result_df = pd.read_csv(output_dir + '/' + file, sep=' ')
             error = list(result_df.sum(axis=0))
-            f.write(file[:-4]+ '\t' + str(error[2]) + '\t' + str(error[2]/error[1]) + '\n')
+            f.write(file[:-4]+ '\t' + str(error[2]) + '\t' + str(error[3]) + '\n')
 
     results_df = pd.read_csv(results_file, sep='\t').set_index('Model')
     results_summed_df = pd.DataFrame()
