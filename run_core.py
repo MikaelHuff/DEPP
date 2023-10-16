@@ -75,10 +75,10 @@ def run_all(args, selection, training=False):
         with open(log_dir, 'x') as f:
             f.write('model name\tfinal epoch\tfinal loss\n')
             train_models.train(args, data_dir, 'full', amount=run_amount, log=f, verbose=verbose)
-            # train_models.train(args, data_dir, 'no5-mer', amount=run_amount, log=f, verbose=verbose)
-            # models = train_models.train(args, data_dir, 'base', amount=run_amount, log=f, verbose=verbose)
-            # train_models.train(args, data_dir, model_type='dual', amount=run_amount, base_models=models, log=f,
-            #                    verbose=verbose)
+            train_models.train(args, data_dir, 'no5-mer', amount=run_amount, log=f, verbose=verbose)
+            models = train_models.train(args, data_dir, 'base', amount=run_amount, log=f, verbose=verbose)
+            train_models.train(args, data_dir, model_type='dual', amount=run_amount, base_models=models, log=f,
+                               verbose=verbose)
     print('depp models trained\n')
 
 
