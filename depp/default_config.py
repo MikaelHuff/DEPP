@@ -50,8 +50,8 @@ default_config = \
 'backbone_id': None,
 'recon_backbone_emb':None,
 'load_model': None,
-
 'cluster_num': 1,
+
 'selection' : [1,1,1,1,1,1,1,1],
 'tree_scaling' : 100,
 'min_delta': 0,
