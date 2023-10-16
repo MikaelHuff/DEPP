@@ -10,6 +10,3 @@ def merge_replicates_in_list(replicate_list):
 
     new_list = list(new_list_dict.keys())
     return new_list
-
-
-    pass
