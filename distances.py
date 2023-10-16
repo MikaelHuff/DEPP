@@ -10,44 +10,34 @@ from Bio import SeqIO
 import subprocess
 
 from depp import utils
+import merge_replicants as merge
 
 
 def create_baselines_from_dist(data_dir, output_dir):
     processed_dir = os.path.join(data_dir, 'processed_data')
-    # seq_file = processed_dir + '/seq.fa'
-    # seq_dict = SeqIO.to_dict(SeqIO.parse(seq_file, "fasta"))
     dist_df_ham = pd.read_csv(processed_dir + '/hamming_full.csv', sep='\t').set_index('Unnamed: 0')
     dist_df_jc = pd.read_csv(processed_dir + '/jc_full.csv', sep='\t').set_index('Unnamed: 0')
     dist_df_ham.index = dist_df_ham.index.astype(str).rename('')
     dist_df_jc.index = dist_df_jc.index.astype(str).rename('')
 
 
-    # dist_df = pd.DataFrame.from_dict(dist_dict)
     seq_labels = list(np.loadtxt(processed_dir + '/seq_label.txt', dtype=str))
-    # seq_labels = seq_labels[0:10]
     dist_df_ham = dist_df_ham.reindex(seq_labels, axis=0).reindex(seq_labels, axis=1)
     dist_df_jc = dist_df_jc.reindex(seq_labels, axis=0).reindex(seq_labels, axis=1)
 
-
-    # dist_df = dist_df/seq_len
-    # dist_df_jc = (-3/4) * np.log(1- (4/3) * dist_df)
-
     query_labels = np.loadtxt(processed_dir + '/query_label.txt', dtype=str)
     backbone_labels = np.loadtxt(processed_dir + '/backbone_label.txt', dtype=str)
-    # query_labels = seq_labels[0:2]
-    # backbone_labels = seq_labels[2:10]
+
     dist_filtered_df_ham = dist_df_ham.filter(query_labels,axis=0).filter(backbone_labels, axis=1)
     dist_filtered_df_jc = dist_df_jc.filter(query_labels,axis=0).filter(backbone_labels, axis=1)
 
     dist_filtered_df_ham.to_csv(output_dir + '/hamming.csv', sep='\t')
     dist_filtered_df_jc.to_csv(output_dir + '/jc.csv', sep='\t')
 
-
     print('\thamming/jc completed')
 
 
 def find_and_scale_tree(data_dir, output_dir, scale=1, verbose=True):
-    #tree_denropy = dendropy.Tree.get(path=tree_file, schema='newick')
     processed_dir = os.path.join(data_dir, 'processed_data')
 
     tree_file = ''
@@ -61,13 +51,7 @@ def find_and_scale_tree(data_dir, output_dir, scale=1, verbose=True):
 
     tree = treeswift.read_tree_newick(tree_file)
     num_nodes = tree.num_nodes(internal=False)
-    # query_labels = processed_dir + '/query_labels.txt'
-    # backbone_labels = processed_dir + '/backbone_labels.txt'
-    # dist_full = pd.read_csv(processed_dir + '/jc_full.csv', sep='\t').set_index('Unnamed: 0')
-    # dist_full.index = dist_full.index.rename('')
-    # dist_filtered = dist_full.reindex(query_labels, axis=0).reindex(backbone_labels, axis=1)
     dist_dir = output_dir + '/jc.csv'
-    # dist_filtered.to_csv(dist_dir)
 
     seq_labels = list(np.loadtxt(processed_dir + '/seq_label.txt', dtype=str))
     if num_nodes < len(seq_labels):
@@ -93,12 +77,10 @@ def find_and_scale_tree(data_dir, output_dir, scale=1, verbose=True):
             subprocess.run(command2, stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
         else:
             subprocess.run(command2)
-        # tree_file = tree_output_dir
         tree_true = treeswift.read_tree_newick(processed_dir + '/true_tree.newick')
     else:
         tree_true = tree
         tree_true.write_tree_newick(processed_dir + '/true_tree.newick')
-    # tree_test = treeswift.read_tree_newick(tree_output_dir)
 
     backbone_file = processed_dir + '/backbone_label.txt'
     backbone_labels = np.loadtxt(backbone_file, dtype=str)
@@ -133,12 +115,9 @@ def create_baselines_from_tree(data_dir, output_dir):
     dist_df.index = dist_df.index.astype(str)
     dist_df.columns = dist_df.columns.astype(str)
     dist_df = dist_df.fillna(0)
-    # print('\ttest1', dist_df.to_numpy()[0,0])
-    dist_df = dist_df.reindex(seq_labels, axis=0, method=None).reindex(seq_labels, axis=1, method=None)
-    # print('\ttest2', dist_df.to_numpy()[0,0])
 
-    dist_filtered_df = dist_df.filter(query_labels, axis=0).filter(backbone_labels, axis=1)
-    # print('\ttest3', dist_filtered_df.to_numpy()[0,0])
+    dist_filtered_df = dist_df.reindex(query_labels, axis=0).reindex(backbone_labels, axis=1)
+    # dist_filtered_df = dist_df.filter(query_labels, axis=0).filter(backbone_labels, axis=1)
 
     dist_filtered_df.to_csv(output_dir + '/true_tree.csv', sep='\t')
 
@@ -150,7 +129,6 @@ def create_distances_from_model(data_dir, output_dir, scale, verbose=True):
     processed_dir = os.path.join(data_dir, 'processed_data')
     backbone_seq = processed_dir + '/backbone_seq.fa'
     query_seq = processed_dir + '/query_seq.fa'
-    # seq_labels = list(np.loadtxt(processed_dir + '/seq_label.txt', dtype=str))
 
     for model_type in os.listdir(models_dir):
         if model_type != 'log.csv':
@@ -176,19 +154,17 @@ def create_distances_from_model(data_dir, output_dir, scale, verbose=True):
 
 
                 dist_df = pd.read_csv(os.path.join(output_dir,'depp.csv'), sep='\t').set_index('Unnamed: 0')/scale
-                # dist_df.index.name = ''
+                dist_df = merge.merge_replicants_in_dataframe(dist_df, '_')
+
                 dist_df.index = dist_df.index.astype(str).rename('')
                 dist_df.columns = dist_df.columns.astype(str)
-                # print(dist_df.index.name)
-                # print(dist_df.columns)
                 query_labels = np.loadtxt(processed_dir + '/query_label.txt', dtype=str)
                 backbone_labels = np.loadtxt(processed_dir + '/backbone_label.txt', dtype=str)
                 dist_sorted_df = dist_df.reindex(query_labels, axis=0).reindex(backbone_labels, axis=1)
-                # dist_filtered_df = dist_df.filter(query_labels, axis=0).filter(backbone_labels, axis=1)
+
                 dist_sorted_df.to_csv(os.path.join(output_type_dir, model[:-5]+'.csv'), sep='\t')
 
                 os.remove(os.path.join(output_dir,'depp.csv'))
-                # os.rename(os.path.join(output_dir,'depp.csv'), os.path.join(output_type_dir, model[:-5]+'.csv'))
     if os.path.exists(output_dir + '/backbone_embeddings.pt'):
         os.remove(output_dir + '/backbone_embeddings.pt')
     if os.path.exists(output_dir + '/backbone_names.pt'):
@@ -206,10 +182,6 @@ def evaluate_distances(distance_dir, run_amount=1, verbose=True):
         for depp_type in os.listdir(depp_dir):
             if depp_type != 'training' and baseline != 'training':
                 depp_mat_dir = os.path.join(depp_dir, depp_type)
-                # print(depp_dir)
-                # print(depp_type)
-                # print(depp_mat_dir)
-                # print(os.listdir(depp_mat_dir))
                 for depp_dist in os.listdir(depp_mat_dir):
                     if verbose:
                         print('\t\t' + depp_dist)
@@ -223,19 +195,9 @@ def evaluate_distances(distance_dir, run_amount=1, verbose=True):
     output_file_raw = distance_dir + '/results_raw.csv'
     results_df.to_csv(output_file_raw, sep='\t')
 
-    results_summed_df = pd.DataFrame()
-    for row in results_df.index:
-        hyphen_location = -(row[::-1].find('-')+1)
-        row_new = row[:hyphen_location]
-        if row_new not in results_summed_df.index:
-            results_summed_df = results_summed_df.append(results_df.loc[row])
-            results_summed_df = results_summed_df.rename(index={row:row_new})
-        else:
-            results_summed_df.loc[row_new] += results_df.loc[row]
-
-    results_averaged_df = results_summed_df/run_amount
+    results_merged_df = merge.merge_replicants_in_dataframe(results_df, '-')
     output_file = distance_dir + '/results_avg.csv'
-    results_averaged_df.to_csv(output_file, sep='\t')
+    results_merged_df.to_csv(output_file, sep='\t')
 
 
 

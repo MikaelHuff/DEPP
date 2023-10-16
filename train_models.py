@@ -34,9 +34,6 @@ def train(args, data_dir, model_type='full', amount=1, base_models=None, log=sys
         log.write(new_file_name[:-5] + '\t' + str(epoch) + '\t' + str(final_loss) + '\n')
 
         if model_type == 'base':
-            # print(model.encoder.linear)
-            # print(type(model.encoder.linear))
-            # sys.exit()
             models.append(model.encoder.linear)
 
         for file in os.listdir(model_dir):

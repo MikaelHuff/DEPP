@@ -4,7 +4,6 @@ import shutil
 import numpy as np
 import pandas as pd
 from Bio import SeqIO
-import dendropy
 import treeswift
 import subprocess
 
@@ -12,13 +11,10 @@ from depp import utils
 import merge_replicants as merge
 
 
-
-# seq = SeqIO.to_dict(SeqIO.parse(backbone_seq_file, "fasta"))
-# args.sequence_length = len(list(seq.values())[0])
-# tree = dendropy.Tree.get(path=backbone_tree_file, schema='newick')
 def group_data(data_dir, output_dir, replicates):
     seq_file = data_dir + '/seq.fa'
     shutil.copy(seq_file, output_dir+'/seq.fa')
+
 
     seq = SeqIO.to_dict(SeqIO.parse(seq_file, "fasta"))
     if not replicates:
@@ -26,7 +22,6 @@ def group_data(data_dir, output_dir, replicates):
     else:
         seq_labels = np.array(merge.merge_replicates_in_list(list(seq.keys())))
     np.savetxt(output_dir + '/seq_label.txt',seq_labels, delimiter='\n', fmt='%s')
-
 
     if 'query_label.txt' in os.listdir(data_dir):
         query_file = data_dir + '/query_label.txt'
@@ -38,23 +33,22 @@ def group_data(data_dir, output_dir, replicates):
     shutil.copy(query_file,output_dir+'/query_label.txt')
 
 
-
-
 def split_sequences(output_dir):
     seq_file = output_dir + '/seq.fa'
     seq = SeqIO.to_dict(SeqIO.parse(seq_file, "fasta"))
 
     query_file = output_dir + '/query_label.txt'
-    queries = np.loadtxt(query_file, dtype=str)
+    query_labels = np.loadtxt(query_file, dtype=str)
 
     backbone_seq = {}
     query_seq = {}
+    # seq_labels = merge.merge_replicates_in_list(list(seq.keys()))
     for key in seq.keys():
-        if key in queries:
+        key_merged = key[0:key.find('_')]
+        if key_merged in query_labels:
             query_seq[key] = seq[key]
         else:
             backbone_seq[key] = seq[key]
-
 
     with open(output_dir + '/backbone_seq.fa', 'w') as handle:
         SeqIO.write(backbone_seq.values(), handle, 'fasta')
@@ -76,15 +70,9 @@ def create_dist_from_seq(data_dir):
     raw_seqs = [np.array(seq_dict[k].seq).reshape(1, -1) for k in seq_dict]
     raw_seqs = np.concatenate(raw_seqs, axis=0)
 
-    # num = 10
-    # names = names[0:num]
-    # raw_seqs = raw_seqs[0:num,0:10]
-
     dist_df_ham, dist_df_jc = utils.jc_dist(raw_seqs, raw_seqs, names, names)
     dist_df_ham.to_csv(processed_dir + '/hamming_full.csv', sep='\t')
     dist_df_jc.to_csv(processed_dir + '/jc_full.csv', sep='\t')
-
-
 
 
 def copy_data_to_training(data_dir, output_dir):

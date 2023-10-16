@@ -1,8 +1,9 @@
 #!/home/user/packages/anaconda3/envs/depp_env/bin/python
 import os
 import pandas as pd
-
 import subprocess
+
+import merge_replicants as merge
 
 def create_placements(data_dir, output_dir, verbose=True):
     dist_dir = os.path.join(data_dir, 'distances', 'depp')
@@ -40,7 +41,6 @@ def create_placements(data_dir, output_dir, verbose=True):
                            '--out-dir', placement_tree_dir,
                            '--allow-file-overwriting', '--fully-resolve'
                 ]
-                # subprocess.run(command)
                 if not verbose:
                     subprocess.run(command, stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
                 else:
@@ -57,7 +57,6 @@ def evaluate_placements(data_dir, placement_dir, run_amount=1):
     backbone_tree_file = processed_dir + '/backbone_tree.newick'
 
     script_file = os.getcwd() + '/evaluate_placement.sh'
-    # print(script_file)
     output_dir = os.path.join(placement_dir, 'evaluations')
     if not os.path.exists(output_dir):
         os.mkdir(output_dir)
@@ -92,15 +91,7 @@ def evaluate_placements(data_dir, placement_dir, run_amount=1):
             f.write(file[:-4]+ '\t' + str(error[2]) + '\t' + str(error[3]) + '\n')
 
     results_df = pd.read_csv(results_file, sep='\t').set_index('Model')
-    results_summed_df = pd.DataFrame()
-    for row in results_df.index:
-        hyphen_location = -(row[::-1].find('-') + 1)
-        row_new = row[:hyphen_location]
-        if row_new not in results_summed_df.index:
-            results_summed_df = results_summed_df.append(results_df.loc[row])
-            results_summed_df = results_summed_df.rename(index={row: row_new})
-        else:
-            results_summed_df.loc[row_new] += results_df.loc[row]
-    results_averaged_df = results_summed_df / run_amount
-    results_averaged_df.index.name = 'Models'
-    results_averaged_df.to_csv(placement_dir + '/results_avg.csv', sep='\t')
+
+    results_merged_df = merge.merge_replicants_in_dataframe(results_df, '-')
+    results_merged_df.index.name = 'Models'
+    results_merged_df.to_csv(placement_dir + '/results_avg.csv', sep='\t')
