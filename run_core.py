@@ -32,9 +32,9 @@ def run_all(args, selection, training=False):
             os.mkdir(output_dir)
 
         if not training:
-            data_prep.group_data(data_dir, output_dir)
+            data_prep.group_data(data_dir, output_dir, args.replicate_seq)
             data_prep.split_sequences(output_dir)
-            data_prep.create_dist_from_seq(output_dir)
+            # data_prep.create_dist_from_seq(output_dir)
             # data_prep.find_and_scale_tree(data_dir, output_dir, scale=tree_scaling, verbose=verbose)
         else:
             old_data_dir = os.path.dirname(data_dir)

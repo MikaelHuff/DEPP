@@ -9,18 +9,22 @@ import treeswift
 import subprocess
 
 from depp import utils
+import merge_replicants as merge
 
 
 
 # seq = SeqIO.to_dict(SeqIO.parse(backbone_seq_file, "fasta"))
 # args.sequence_length = len(list(seq.values())[0])
 # tree = dendropy.Tree.get(path=backbone_tree_file, schema='newick')
-def group_data(data_dir, output_dir):
+def group_data(data_dir, output_dir, replicates):
     seq_file = data_dir + '/seq.fa'
     shutil.copy(seq_file, output_dir+'/seq.fa')
 
     seq = SeqIO.to_dict(SeqIO.parse(seq_file, "fasta"))
-    seq_labels = np.array(list(seq.keys()), dtype=str)
+    if not replicates:
+        seq_labels = np.array(list(seq.keys()), dtype=str)
+    else:
+        seq_labels = np.array(merge.merge_replicates_in_list(list(seq.keys())))
     np.savetxt(output_dir + '/seq_label.txt',seq_labels, delimiter='\n', fmt='%s')
 
 
