@@ -27,7 +27,7 @@ def train(args, data_dir, model_type='full', amount=1, base_models=None, log=sys
         epoch, final_loss, model = train_depp.main(args, model_type, prev_model=base_models[run])
         sys.stdout = sys.__stdout__
         sys.stderr = sys.__stderr__
-        
+
 
         new_file_name = model_type + '-' + str(run) + '.ckpt'
         for file in os.listdir(model_dir):
