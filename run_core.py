@@ -93,7 +93,7 @@ def run_all(args, selection, training=False):
 
     # evaluate distances
     if selection['evaluate_distances']:
-        distances.evaluate_distances(distance_dir, run_amount=run_amount, verbose=verbose)
+        distances.evaluate_distances(distance_dir, verbose=verbose)
     print('distances evaluated\n')
 
     placement_dir = os.path.join(data_dir, 'placements')
@@ -107,7 +107,7 @@ def run_all(args, selection, training=False):
 
     # evaluuate placements
     if selection['evaluate_placements']:
-        placements.evaluate_placements(data_dir, placement_dir, run_amount=run_amount)
+        placements.evaluate_placements(data_dir, placement_dir)
     print('placements evaluated\n')
 
 

@@ -48,7 +48,7 @@ def create_placements(data_dir, output_dir, verbose=True):
 
 
 
-def evaluate_placements(data_dir, placement_dir, run_amount=1):
+def evaluate_placements(data_dir, placement_dir):
     tree_dir = os.path.join(placement_dir, 'placement_trees')
     processed_dir = os.path.join(data_dir, 'processed_data')
     true_tree_file = processed_dir + '/true_tree.newick'
