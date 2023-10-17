@@ -16,20 +16,25 @@ import merge_replicants as merge
 def create_baselines_from_dist(data_dir, output_dir):
     processed_dir = os.path.join(data_dir, 'processed_data')
     dist_df_ham = pd.read_csv(processed_dir + '/hamming_full.csv', sep='\t').set_index('Unnamed: 0')
-    dist_df_jc = pd.read_csv(processed_dir + '/jc_full.csv', sep='\t').set_index('Unnamed: 0')
+    # dist_df_jc = pd.read_csv(processed_dir + '/jc_full.csv', sep='\t').set_index('Unnamed: 0')
     dist_df_ham.index = dist_df_ham.index.astype(str).rename('')
-    dist_df_jc.index = dist_df_jc.index.astype(str).rename('')
+    # dist_df_jc.index = dist_df_jc.index.astype(str).rename('')
+
+    dist_df_ham_merged = merge.merge_replicants_in_dataframe(dist_df_ham).transpose()
+    dist_df_ham_merged = merge.merge_replicants_in_dataframe(dist_df_ham_merged).transpose()
 
 
-    seq_labels = list(np.loadtxt(processed_dir + '/seq_label.txt', dtype=str))
-    dist_df_ham = dist_df_ham.reindex(seq_labels, axis=0).reindex(seq_labels, axis=1)
-    dist_df_jc = dist_df_jc.reindex(seq_labels, axis=0).reindex(seq_labels, axis=1)
-
+    # - 3 / 4 * np.log(1 - 4 / 3 * hamming_dist)
+    # seq_labels = list(np.loadtxt(processed_dir + '/seq_label.txt', dtype=str))
     query_labels = np.loadtxt(processed_dir + '/query_label.txt', dtype=str)
     backbone_labels = np.loadtxt(processed_dir + '/backbone_label.txt', dtype=str)
+    dist_filtered_df_ham = dist_df_ham_merged.reindex(query_labels, axis=0).reindex(backbone_labels, axis=1)
+    dist_filtered_df_jc = - 3 / 4 * np.log(1 - 4 / 3 * dist_filtered_df_ham)
+    # dist_df_jc = dist_df_jc.reindex(seq_labels, axis=0).reindex(seq_labels, axis=1)
 
-    dist_filtered_df_ham = dist_df_ham.filter(query_labels,axis=0).filter(backbone_labels, axis=1)
-    dist_filtered_df_jc = dist_df_jc.filter(query_labels,axis=0).filter(backbone_labels, axis=1)
+
+    # dist_filtered_df_ham = dist_df_ham.filter(query_labels,axis=0).filter(backbone_labels, axis=1)
+    # dist_filtered_df_jc = dist_df_jc.filter(query_labels,axis=0).filter(backbone_labels, axis=1)
 
     dist_filtered_df_ham.to_csv(output_dir + '/hamming.csv', sep='\t')
     dist_filtered_df_jc.to_csv(output_dir + '/jc.csv', sep='\t')
@@ -170,7 +175,7 @@ def create_distances_from_model(data_dir, output_dir, scale, verbose=True):
     if os.path.exists(output_dir + '/backbone_names.pt'):
         os.remove(output_dir + '/backbone_names.pt')
 
-def evaluate_distances(distance_dir, run_amount=1, verbose=True):
+def evaluate_distances(distance_dir, verbose=True):
     results_dict = {}
     baseline_dir = os.path.join(distance_dir,'baselines')
     for baseline in os.listdir(baseline_dir):
@@ -178,18 +183,18 @@ def evaluate_distances(distance_dir, run_amount=1, verbose=True):
             print('\t' + baseline)
         results_dict[baseline] = {}
         depp_dir = os.path.join(distance_dir, 'depp')
+        if 'training' not in baseline:
+            baseline_mat = np.genfromtxt(baseline_dir + '/' + baseline, delimiter='\t')[1:,1:]
+            for depp_type in os.listdir(depp_dir):
+                if 'training' not in depp_type:
+                    depp_mat_dir = os.path.join(depp_dir, depp_type)
+                    for depp_dist in os.listdir(depp_mat_dir):
+                        if verbose:
+                            print('\t\t' + depp_dist)
+                        depp_mat = np.genfromtxt(depp_mat_dir + '/' + depp_dist, delimiter='\t')[1:,1:]
 
-        for depp_type in os.listdir(depp_dir):
-            if depp_type != 'training' and baseline != 'training':
-                depp_mat_dir = os.path.join(depp_dir, depp_type)
-                for depp_dist in os.listdir(depp_mat_dir):
-                    if verbose:
-                        print('\t\t' + depp_dist)
-                    baseline_mat = np.genfromtxt(baseline_dir + '/' + baseline, delimiter='\t')[1:,1:]
-                    depp_mat = np.genfromtxt(depp_mat_dir + '/' + depp_dist, delimiter='\t')[1:,1:]
-
-                    dist = utils.mse_loss(torch.from_numpy(depp_mat), torch.from_numpy(baseline_mat), 'square_root_be')
-                    results_dict[baseline][depp_dist] = float(dist)
+                        dist = utils.mse_loss(torch.from_numpy(depp_mat), torch.from_numpy(baseline_mat), 'square_root_be')
+                        results_dict[baseline][depp_dist] = float(dist)
 
     results_df = pd.DataFrame.from_dict(results_dict)
     output_file_raw = distance_dir + '/results_raw.csv'
