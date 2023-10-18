@@ -50,7 +50,7 @@ def merge_replicants_in_seq(seq_file, output_file, replicate_char='_'):
 
     SeqIO.write(new_list, output_file, 'fasta')
 
-seq_file = '/home/user/DEPP/cur_data/processed_data/query_seq.fa'
-output = '/home/user/DEPP/cur_data/processed_data/query_seq_merged.fa'
-merge_replicants_in_seq(seq_file, output)
+# seq_file = '/home/user/DEPP/cur_data/processed_data/query_seq.fa'
+# output = '/home/user/DEPP/cur_data/processed_data/query_seq_merged.fa'
+# merge_replicants_in_seq(seq_file, output)
 
