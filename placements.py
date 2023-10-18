@@ -48,13 +48,18 @@ def create_placements(data_dir, output_dir, verbose=True):
 
 
 
-def evaluate_placements(data_dir, placement_dir):
+def evaluate_placements(data_dir, placement_dir, replicants):
     tree_dir = os.path.join(placement_dir, 'placement_trees')
     processed_dir = os.path.join(data_dir, 'processed_data')
     true_tree_file = processed_dir + '/true_tree.newick'
     # query_file = processed_dir + '/query_label.txt'
     query_file = processed_dir + '/query_seq.fa'
+    if replicants:
+        query_file_merged = processed_dir +'/query_seq_merged.fa'
+        merge.merge_replicants_in_seq(query_file, query_file_merged)
+        query_file = query_file_merged
     backbone_tree_file = processed_dir + '/backbone_tree.newick'
+
 
     script_file = os.getcwd() + '/evaluate_placement.sh'
     output_dir = os.path.join(placement_dir, 'evaluations')
@@ -63,8 +68,7 @@ def evaluate_placements(data_dir, placement_dir):
     for tree_file in os.listdir(tree_dir):
         print('\t' + tree_file)
         tree_file_full = tree_dir + '/' + tree_file
-        command = ['bash',
-                   script_file,
+        command = ['bash', script_file,
                    true_tree_file,
                    tree_file_full,
                    query_file,

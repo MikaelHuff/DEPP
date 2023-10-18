@@ -107,7 +107,7 @@ def run_all(args, selection, training=False):
 
     # evaluuate placements
     if selection['evaluate_placements']:
-        placements.evaluate_placements(data_dir, placement_dir)
+        placements.evaluate_placements(data_dir, placement_dir, args.replicate_seq)
     print('placements evaluated\n')
 
 
