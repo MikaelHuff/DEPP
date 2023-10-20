@@ -159,11 +159,11 @@ def main():
         'evaluate_placements': args.selection[6],
         'compile_results': args.selection[7]
     }
-    training = args.training
+
     # training = False
 
     run_all(args, selection)
-    if training:
+    if args.training:
         selection['create_models'] = False
         selection['create_placements'] = False
         selection['evaluate_placements'] = False

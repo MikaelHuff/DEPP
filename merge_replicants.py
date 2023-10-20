@@ -7,9 +7,12 @@ from Bio.SeqRecord import SeqRecord
 def merge_replicates_in_list(replicate_list, replicate_char='_'):
     new_list_dict = {}
     for name in replicate_list:
-        char_location = -(name[::-1].find(replicate_char) + 1)
-        new_name = name[:char_location]
-        new_list_dict[new_name] = 1
+        if replicate_char in name:
+            char_location = -(name[::-1].find(replicate_char) + 1)
+            new_name = name[:char_location]
+            new_list_dict[new_name] = 1
+        else:
+            new_list_dict[name] = 0
 
     new_list = list(new_list_dict.keys())
     return new_list
