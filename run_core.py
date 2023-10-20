@@ -66,8 +66,6 @@ def run_all(args, selection, training=False):
             os.rename(model_dir, data_dir + '/models_old/')
         os.mkdir(model_dir)
 
-
-        # base, full, dual, no-5mer
         log_dir = model_dir + 'log.csv'
         if os.path.exists(log_dir):
             os.remove(log_dir)
@@ -80,8 +78,6 @@ def run_all(args, selection, training=False):
             train_models.train(args, data_dir, model_type='dual', amount=run_amount, base_models=models, log=f,
                                verbose=verbose)
     print('depp models trained\n')
-
-
 
     #create depp distances
     if selection['create_depp_distances']:

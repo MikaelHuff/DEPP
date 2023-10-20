@@ -44,11 +44,16 @@ def split_sequences(output_dir):
     query_seq = {}
     # seq_labels = merge.merge_replicates_in_list(list(seq.keys()))
     for key in seq.keys():
-        key_merged = key[0:key.find('_')]
-        if key_merged in query_labels:
+        if '_' in key:
+            key_true = key[0:key.find('_')]
+        else:
+            key_true = key
+
+        if key_true in query_labels:
             query_seq[key] = seq[key]
         else:
             backbone_seq[key] = seq[key]
+
 
     with open(output_dir + '/backbone_seq.fa', 'w') as handle:
         SeqIO.write(backbone_seq.values(), handle, 'fasta')

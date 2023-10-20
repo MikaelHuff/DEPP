@@ -14,8 +14,9 @@ def train(args, data_dir, model_type='full', amount=1, base_models=None, log=sys
         os.mkdir(output_dir)
 
     args.model_dir = model_dir
-    args.backbone_tree_file = data_dir + '/processed_data/scaled_tree.newick'
-    args.backbone_seq_file = data_dir + '/processed_data/backbone_seq.fa'
+    processed_dir = os.path.join(data_dir, 'processed_data')
+    args.backbone_tree_file = processed_dir + '/scaled_tree.newick'
+    args.backbone_seq_file = processed_dir + '/backbone_seq.fa'
 
     models = []
     for run in range(amount):
