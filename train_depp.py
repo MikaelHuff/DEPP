@@ -32,6 +32,9 @@ def main(args_new=None, model_type='full', prev_model=None):
     if args_new != None:
         args = args_new
 
+    print('HELLO-' )
+    print(args.epoch)
+
     model_dir = args.model_dir
     os.makedirs(model_dir, exist_ok=True)
 
@@ -87,7 +90,12 @@ def main(args_new=None, model_type='full', prev_model=None):
 
     trainer.fit(model)
     final_loss = float(early_stop_callback.best_score)
-    return early_stop_callback.stopped_epoch, final_loss, model
+    if early_stop_callback.stopped_epoch == 0 and args.epoch != 5001:
+        final_epoch = args.epoch
+    else:
+        final_epoch = early_stop_callback.stopped_epoch == 0
+
+    return final_epoch, final_loss, model
 
 if __name__ == '__main__':
     main()

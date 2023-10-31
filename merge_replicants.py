@@ -21,6 +21,7 @@ def merge_replicates_in_list(replicate_list, replicate_char='_'):
 def merge_replicants_in_dataframe(replicate_df, replicate_char='_'):
     new_df = pd.DataFrame()
     repeat_am = {}
+    replicate_df.index = replicate_df.index.astype(str)
     for row in replicate_df.index:
         if replicate_char in row:
             char_location = -(row[::-1].find(replicate_char) + 1)

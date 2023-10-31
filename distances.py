@@ -47,11 +47,11 @@ def find_and_scale_tree(data_dir, output_dir, scale=1, verbose=True):
 
     tree_file = ''
     for file in os.listdir(data_dir):
-        if 'tree' in file:
+        if 'tree' in file or 'Tree' in file:
             tree_file = data_dir + '/' + file
     if tree_file == '':
         for file in os.listdir(os.path.dirname(data_dir)):
-            if 'tree' in file:
+            if 'tree' in file or 'Tree' in file:
                 tree_file = data_dir + '/' + file
 
     tree = treeswift.read_tree_newick(tree_file)

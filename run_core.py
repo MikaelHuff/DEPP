@@ -63,6 +63,7 @@ def run_all(args, selection, training=False):
     if selection['create_models']:
         model_dir = data_dir + '/models/'
         if os.path.exists(model_dir):
+            #shutil.rmtree(model_dir)
             os.rename(model_dir, data_dir + '/models_old/')
         os.mkdir(model_dir)
 
