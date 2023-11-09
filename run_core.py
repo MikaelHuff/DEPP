@@ -134,6 +134,8 @@ def run_all(args, selection, training=False):
         if not training:
             shutil.copy(os.path.join(data_dir, 'placements') + '/results_raw.csv', result_dir + '/placement_evaluations_all.csv')
             shutil.copy(os.path.join(data_dir, 'placements') + '/results_avg.csv', result_dir + '/placement_evaluations_avg.csv')
+
+            shutil.copytree(os.path.join(data_dir, 'placements', 'evaluations'), result_dir + '/placement_evaluations/')
         print('results grouped in ' + result_dir)
 
 
