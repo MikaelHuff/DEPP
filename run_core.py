@@ -125,17 +125,35 @@ def run_all(args, selection, training=False):
             result_dir = os.path.join(root_dir, 'results', 'training')
             os.mkdir(result_dir)
 
+        try:
+            shutil.copy(os.path.join(data_dir, 'models') + '/log.csv', result_dir + '/model_training_log.csv')
+        except:
+            print('\t no models to copy')
 
-        shutil.copy(os.path.join(data_dir, 'models') + '/log.csv', result_dir + '/model_training_log.csv')
-
-        shutil.copy(os.path.join(data_dir, 'distances') + '/results_raw.csv', result_dir + '/distance_evaluations_all.csv')
-        shutil.copy(os.path.join(data_dir, 'distances') + '/results_avg.csv', result_dir + '/distance_evaluations_avg.csv')
+        try:
+            shutil.copy(os.path.join(data_dir, 'distances') + '/results_raw.csv', result_dir + '/distance_evaluations_all.csv')
+        except:
+            print('\t no raw distance to copy')
+        try:
+            shutil.copy(os.path.join(data_dir, 'distances') + '/results_avg.csv', result_dir + '/distance_evaluations_avg.csv')
+        except:
+            print('\t no avg distance to copy')
 
         if not training:
-            shutil.copy(os.path.join(data_dir, 'placements') + '/results_raw.csv', result_dir + '/placement_evaluations_all.csv')
-            shutil.copy(os.path.join(data_dir, 'placements') + '/results_avg.csv', result_dir + '/placement_evaluations_avg.csv')
 
-            shutil.copytree(os.path.join(data_dir, 'placements', 'evaluations'), result_dir + '/placement_evaluations/')
+            try:
+                shutil.copy(os.path.join(data_dir, 'placements') + '/results_raw.csv', result_dir + '/placement_evaluations_all.csv')
+            except:
+                print('\t no raw placements to copy')
+            try:
+                shutil.copy(os.path.join(data_dir, 'placements') + '/results_avg.csv', result_dir + '/placement_evaluations_avg.csv')
+            except:
+                print('\t no avg placements to copy')
+            try:
+                shutil.copytree(os.path.join(data_dir, 'placements', 'evaluations'), result_dir + '/placement_evaluations/')
+            except:
+                print('\t no placement query directory to copy')
+                
         print('results grouped in ' + result_dir)
 
 
