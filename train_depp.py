@@ -32,7 +32,6 @@ def main(args_new=None, model_type='full', prev_model=None):
     if args_new != None:
         args = args_new
 
-    print('HELLO-' )
     print(args.epoch)
 
     model_dir = args.model_dir

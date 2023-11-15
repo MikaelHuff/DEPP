@@ -27,6 +27,7 @@ def create_baselines_from_dist(data_dir, output_dir):
     # - 3 / 4 * np.log(1 - 4 / 3 * hamming_dist)
     # seq_labels = list(np.loadtxt(processed_dir + '/seq_label.txt', dtype=str))
     query_labels = np.loadtxt(processed_dir + '/query_label.txt', dtype=str)
+    # query_labels = np.loadtxt(processed_dir + '/backbone_label.txt', dtype=str)
     backbone_labels = np.loadtxt(processed_dir + '/backbone_label.txt', dtype=str)
     dist_filtered_df_ham = dist_df_ham_merged.reindex(query_labels, axis=0).reindex(backbone_labels, axis=1)
     dist_filtered_df_jc = - 3 / 4 * np.log(1 - 4 / 3 * dist_filtered_df_ham)
@@ -104,6 +105,7 @@ def create_baselines_from_tree(data_dir, output_dir):
 
     seq_labels = list(np.loadtxt(processed_dir + '/seq_label.txt', dtype=str))
     query_labels = list(np.loadtxt(processed_dir + '/query_label.txt', dtype=str))
+    # query_labels = list(np.loadtxt(processed_dir + '/backbone_label.txt', dtype=str))
     backbone_labels = list(np.loadtxt(processed_dir + '/backbone_label.txt', dtype=str))
     num_nodes = tree.num_nodes(internal=False)
     if num_nodes < len(seq_labels):
@@ -134,6 +136,11 @@ def create_distances_from_model(data_dir, output_dir, scale, verbose=True):
     processed_dir = os.path.join(data_dir, 'processed_data')
     backbone_seq = processed_dir + '/backbone_seq.fa'
     query_seq = processed_dir + '/query_seq.fa'
+    # query_seq = processed_dir + '/backbone_seq.fa'
+
+    query_labels = np.loadtxt(processed_dir + '/query_label.txt', dtype=str)
+    # query_labels = np.loadtxt(processed_dir + '/backbone_label.txt', dtype=str)
+    backbone_labels = np.loadtxt(processed_dir + '/backbone_label.txt', dtype=str)
 
     for model_type in os.listdir(models_dir):
         if model_type != 'log.csv':
@@ -163,13 +170,12 @@ def create_distances_from_model(data_dir, output_dir, scale, verbose=True):
 
                 dist_df.index = dist_df.index.astype(str).rename('')
                 dist_df.columns = dist_df.columns.astype(str)
-                query_labels = np.loadtxt(processed_dir + '/query_label.txt', dtype=str)
-                backbone_labels = np.loadtxt(processed_dir + '/backbone_label.txt', dtype=str)
+
                 dist_sorted_df = dist_df.reindex(query_labels, axis=0).reindex(backbone_labels, axis=1)
 
                 dist_sorted_df.to_csv(os.path.join(output_type_dir, model[:-5]+'.csv'), sep='\t')
 
-                os.remove(os.path.join(output_dir,'depp.csv'))
+                # os.remove(os.path.join(output_dir,'depp.csv'))
     if os.path.exists(output_dir + '/backbone_embeddings.pt'):
         os.remove(output_dir + '/backbone_embeddings.pt')
     if os.path.exists(output_dir + '/backbone_names.pt'):
@@ -207,10 +213,30 @@ def evaluate_distances(args, distance_dir, verbose=True):
 
 
 
+from depp import default_config
+from omegaconf import OmegaConf
+
+def main():
+
+    args_base = OmegaConf.create(default_config.default_config)
+    args_cli = OmegaConf.from_cli()
+    args = OmegaConf.merge(args_base, args_cli)
+
+    data_dir = '/home/user/DEPP/simulated_data/ils_data/model.200.500000.0.000001/04/2/'
+    output_dir = '/home/user/DEPP/simulated_data/ils_data/model.200.500000.0.000001/04/2/train'
+    # create_distances_from_model(data_dir, output_dir, 100, True)
+
+    output_dir = '/home/user/DEPP/simulated_data/ils_data/model.200.500000.0.000001/04/2/train/baselines'
+    create_baselines_from_dist(data_dir, output_dir)
+    create_baselines_from_tree(data_dir, output_dir)
+
+    distance_dir = '/home/user/DEPP/simulated_data/ils_data/model.200.500000.0.000001/04/2/train/'
+    args.weighted_method = 'ols'
+    evaluate_distances(args, distance_dir,True)
 
 
-
-
+if __name__ == '__main__':
+    main()
 
 
 

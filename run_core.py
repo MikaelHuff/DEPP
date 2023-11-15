@@ -139,6 +139,11 @@ def run_all(args, selection, training=False):
         except:
             print('\t no avg distance to copy')
 
+        try:
+            shutil.copytree(os.path.join(data_dir, 'distances'), os.path.join(result_dir, 'distances.csv'))
+        except:
+            print('\t no distance matrices to copy')
+
         if not training:
 
             try:
@@ -150,7 +155,7 @@ def run_all(args, selection, training=False):
             except:
                 print('\t no avg placements to copy')
             try:
-                shutil.copytree(os.path.join(data_dir, 'placements', 'evaluations'), result_dir + '/placement_evaluations/')
+                shutil.copytree(os.path.join(data_dir, 'placements', 'evaluations'), os.path.join(result_dir, 'placement_evaluations'))
             except:
                 print('\t no placement query directory to copy')
                 
