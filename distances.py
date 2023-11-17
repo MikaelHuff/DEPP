@@ -175,7 +175,7 @@ def create_distances_from_model(data_dir, output_dir, scale, verbose=True):
 
                 dist_sorted_df.to_csv(os.path.join(output_type_dir, model[:-5]+'.csv'), sep='\t')
 
-                # os.remove(os.path.join(output_dir,'depp.csv'))
+                os.remove(os.path.join(output_dir,'depp.csv'))
     if os.path.exists(output_dir + '/backbone_embeddings.pt'):
         os.remove(output_dir + '/backbone_embeddings.pt')
     if os.path.exists(output_dir + '/backbone_names.pt'):
