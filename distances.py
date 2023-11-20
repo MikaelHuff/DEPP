@@ -181,7 +181,7 @@ def create_distances_from_model(data_dir, output_dir, scale, verbose=True):
     if os.path.exists(output_dir + '/backbone_names.pt'):
         os.remove(output_dir + '/backbone_names.pt')
 
-def evaluate_distances(args, distance_dir, verbose=True):
+def evaluate_distances(args, distance_dir, training=False, verbose=True):
     results_dict = {}
     baseline_dir = os.path.join(distance_dir,'baselines')
     for baseline in os.listdir(baseline_dir):
@@ -198,6 +198,10 @@ def evaluate_distances(args, distance_dir, verbose=True):
                         if verbose:
                             print('\t\t' + depp_dist)
                         depp_mat = np.genfromtxt(depp_mat_dir + '/' + depp_dist, delimiter='\t')[1:,1:]
+                        if training:
+                            np.fill_diagonal(depp_mat, 0)
+                            np.fill_diagonal(baseline_mat, 0)
+                            
 
                         dist = utils.mse_loss(torch.from_numpy(depp_mat), torch.from_numpy(baseline_mat), args.weighted_method)
                         results_dict[baseline][depp_dist] = float(dist)
