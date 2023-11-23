@@ -198,10 +198,11 @@ def evaluate_distances(args, distance_dir, training=False, verbose=True):
                         if verbose:
                             print('\t\t' + depp_dist)
                         depp_mat = np.genfromtxt(depp_mat_dir + '/' + depp_dist, delimiter='\t')[1:,1:]
+                        depp_mat = np.square(depp_mat)
                         if training:
                             np.fill_diagonal(depp_mat, 0)
                             np.fill_diagonal(baseline_mat, 0)
-                            
+
 
                         dist = utils.mse_loss(torch.from_numpy(depp_mat), torch.from_numpy(baseline_mat), args.weighted_method)
                         results_dict[baseline][depp_dist] = float(dist)
