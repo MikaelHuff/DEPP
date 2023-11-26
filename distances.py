@@ -198,7 +198,7 @@ def evaluate_distances(args, distance_dir, training=False, verbose=True):
                         if verbose:
                             print('\t\t' + depp_dist)
                         depp_mat = np.genfromtxt(depp_mat_dir + '/' + depp_dist, delimiter='\t')[1:,1:]
-                        depp_mat = np.square(depp_mat)
+                        #depp_mat = np.square(depp_mat)
                         if training:
                             np.fill_diagonal(depp_mat, 0)
                             np.fill_diagonal(baseline_mat, 0)
