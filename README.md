@@ -1,3 +1,5 @@
+# Note: The actual network and model was created by Yueyu Jiang (<y5jiang@eng.ucsd.edu>). My work is on testing the model for phylogenetic based equations and probabilities.
+
 # DEPP
 
 This is the code for the paper DEPP: Deep Learning Enables Extending Species Trees using Single Genes. The data is located https://ter-trees.ucsd.edu/data/depp/latest/.
